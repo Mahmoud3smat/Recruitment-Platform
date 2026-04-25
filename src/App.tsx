@@ -14,6 +14,7 @@ import { JobDetail } from "@/Pages/JobDetail";
 import { About } from "@/Pages/About";
 import { Login } from "@/Pages/Login";
 import { Register } from "@/Pages/Register";
+import { NotFound } from "@/Components/NotFound";
 
 const AppRoutes = () => (
   <div className="flex min-h-screen flex-col">
@@ -28,6 +29,7 @@ const AppRoutes = () => (
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </main>
 
