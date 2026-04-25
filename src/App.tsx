@@ -1,9 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// -------------- Contexts --------------
+import { AuthProvider } from "./Contexts/AuthContext";
+
+// -------------- Fixed Components --------------
 import { Navbar } from "@/Components/Navbar";
 import { Footer } from "@/Components/Footer";
-import { AuthProvider } from "./Contexts/AuthContext";
+
+// -------------- Pages --------------
 import { Index } from "@/Pages/Index";
 import { Jobs } from "@/Pages/Jobs";
+import { JobDetail } from "@/Pages/JobDetail";
 
 const AppRoutes = () => (
   <div className="flex min-h-screen flex-col">
@@ -14,6 +21,7 @@ const AppRoutes = () => (
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs/:id" element={<JobDetail />} />
       </Routes>
     </main>
 
