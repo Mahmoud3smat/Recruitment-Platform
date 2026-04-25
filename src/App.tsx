@@ -11,6 +11,11 @@ import { Footer } from "@/Components/Footer";
 import { Index } from "@/Pages/Index";
 import { Jobs } from "@/Pages/Jobs";
 import { JobDetail } from "@/Pages/JobDetail";
+import { Login } from "@/Pages/Login";
+import { Register } from "@/Pages/Register";
+
+
+
 
 const AppRoutes = () => (
   <div className="flex min-h-screen flex-col">
@@ -22,6 +27,8 @@ const AppRoutes = () => (
         <Route path="/" element={<Index />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/:id" element={<JobDetail />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </main>
 
