@@ -86,8 +86,8 @@ export const Index = () => {
               <Link to="/jobs">
                 <Button
                   size="lg"
-                  variant="outline"
-                  className="gap-2 text-base border-primary-foreground/30 text-primary-foreground bg-primary-foreground/10 hover:bg-blue-600 hover:text-primary-foreground"
+                  variant="undefault"
+                  className="gap-2 text-base"
                 >
                   Browse Jobs
                 </Button>
@@ -196,7 +196,7 @@ export const Index = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="gap-2 text-base border-primary-foreground/30 text-primary-foreground bg-primary-foreground/10 hover:text-black"
+                  className="gap-2 text-base text-primary-foreground hover:text-black"
                 >
                   I'm a Company
                 </Button>

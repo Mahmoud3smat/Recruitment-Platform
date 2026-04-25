@@ -2,6 +2,7 @@ import React from "react";
 
 type Variant =
   | "default"
+  | "undefault"
   | "destructive"
   | "outline"
   | "secondary"
@@ -16,9 +17,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  default: "bg-blue-600 text-white hover:bg-blue-700",
+  default: "bg-[#1c5d6f] text-white hover:bg-[#1c5d8a]",
+  undefault:
+    "bg-transparent text-white hover:bg-[#1c5d6f] border border-[#1c5d6f]",
   destructive: "bg-red-600 text-white hover:bg-red-700",
-  outline: "border border-gray-300 bg-white hover:bg-gray-100 text-gray-900",
+  outline: "border border-gray-300 hover:bg-gray-100",
   secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
   ghost: "hover:bg-gray-100 text-gray-900",
   link: "text-blue-600 underline hover:text-blue-700",
