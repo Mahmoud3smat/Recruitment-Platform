@@ -3,6 +3,7 @@ import { Navbar } from "@/Components/Navbar.tsx";
 import { Footer } from "@/Components/Footer.tsx";
 import { AuthProvider } from "./Contexts/AuthContext";
 import { Index } from "@/Pages/Index.tsx";
+import { Jobs } from "@/Pages/Jobs";
 
 const AppRoutes = () => (
   <div className="flex min-h-screen flex-col">
@@ -12,6 +13,7 @@ const AppRoutes = () => (
     <main className="flex-1">
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/jobs" element={<Jobs />} />
       </Routes>
     </main>
 
