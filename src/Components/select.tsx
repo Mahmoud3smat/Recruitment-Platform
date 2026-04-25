@@ -80,15 +80,11 @@ export function SelectValue({
   );
 }
 
-<<<<<<< HEAD
-export function SelectContent({ children }: { children: React.ReactNode }) {
-=======
 export function SelectContent({
   children,
 }: {
   children: React.ReactNode;
 }) {
->>>>>>> 8d61079345fdb1500974bd971b6ea510e7a833c3
   const { open } = useSelect();
 
   if (!open) return null;
@@ -120,8 +116,4 @@ export function SelectItem({
       {children}
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 8d61079345fdb1500974bd971b6ea510e7a833c3
