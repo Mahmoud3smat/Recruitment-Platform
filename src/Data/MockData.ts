@@ -161,9 +161,9 @@ export const teamMembers = [
     name: "Fawzia Yasser",
     role: "Frontend Developer | Seeker Dashboard",
     bio: "Comfortable across the entire stack. Bridges the gap between frontend and backend.",
-    linkedin: "https://linkedin.com",
+    linkedin: "https://www.linkedin.com/in/fawzia-yasser-177852235",
     facebook: "https://facebook.com",
-    whatsapp: "https://wa.me/",
+    whatsapp: "https://wa.me/201287292585",
   },
 ];
 

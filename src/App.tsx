@@ -16,6 +16,7 @@ import { Team } from "@/Pages/Team";
 import { Login } from "@/Pages/Login";
 import { Register } from "@/Pages/Register";
 import { NotFound } from "@/Components/NotFound";
+import { SeekerDashboard } from "@/Pages/SeekerDashboard";
 
 const AppRoutes = () => (
   <div className="flex min-h-screen flex-col">
@@ -36,6 +37,9 @@ const AppRoutes = () => (
         {/* --------- Login & Register --------- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* --------- Seeker & Company --------- */}
+        <Route path="/seeker-dashboard" element={<SeekerDashboard />} />
 
         {/* --------- Not Found --------- */}
         <Route path="*" element={<NotFound />} />

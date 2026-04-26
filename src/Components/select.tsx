@@ -11,21 +11,27 @@ type SelectContextType = {
   open: boolean;
   setOpen: (v: boolean) => void;
   options: Option[];
+  disabled?: boolean;
 };
 
 const SelectContext = createContext<SelectContextType | null>(null);
+
+// ---------- Root ----------
+type SelectProps = {
+  children: React.ReactNode;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  options?: Option[];
+  disabled?: boolean;
+};
 
 export function Select({
   children,
   value,
   onValueChange,
   options = [],
-}: {
-  children: React.ReactNode;
-  value?: string;
-  onValueChange?: (value: string) => void;
-  options?: Option[];
-}) {
+  disabled = false,
+}: SelectProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,6 +42,7 @@ export function Select({
         open,
         setOpen,
         options,
+        disabled,
       }}
     >
       <div className="relative w-full">{children}</div>
@@ -49,23 +56,34 @@ function useSelect() {
   return ctx;
 }
 
+// ---------- Trigger ----------
 export function SelectTrigger({
   className = "",
   children,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const { open, setOpen } = useSelect();
+  const { open, setOpen, disabled } = useSelect();
 
   return (
     <div
-      onClick={() => setOpen(!open)}
-      className={`flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 text-sm cursor-pointer focus:ring-2 focus:ring-blue-500 ${className}`}
+      onClick={() => {
+        if (disabled) return;
+        setOpen(!open);
+      }}
+      className={`flex h-10 w-full items-center justify-between rounded-md border px-3 text-sm transition
+        ${
+          disabled
+            ? "bg-gray-100 cursor-not-allowed opacity-60"
+            : "bg-white cursor-pointer hover:border-gray-400"
+        }
+        ${className}`}
     >
       {children}
-      <span>▼</span>
+      <span className="ml-2">▼</span>
     </div>
   );
 }
 
+// ---------- Value ----------
 export function SelectValue({
   placeholder = "Select...",
 }: {
@@ -80,6 +98,7 @@ export function SelectValue({
   );
 }
 
+// ---------- Content ----------
 export function SelectContent({ children }: { children: React.ReactNode }) {
   const { open } = useSelect();
 
@@ -92,6 +111,7 @@ export function SelectContent({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ---------- Item ----------
 export function SelectItem({
   value,
   children,
@@ -99,15 +119,21 @@ export function SelectItem({
   value: string;
   children: React.ReactNode;
 }) {
-  const { setValue, setOpen } = useSelect();
+  const { setValue, setOpen, disabled } = useSelect();
 
   return (
     <div
       onClick={() => {
+        if (disabled) return;
         setValue(value);
         setOpen(false);
       }}
-      className="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100"
+      className={`px-3 py-2 text-sm transition
+        ${
+          disabled
+            ? "cursor-not-allowed opacity-50"
+            : "cursor-pointer hover:bg-gray-100"
+        }`}
     >
       {children}
     </div>

@@ -14,14 +14,31 @@ function useTabs() {
 }
 
 // ---------- Root ----------
-export function Tabs({
-  defaultValue,
-  children,
-}: {
-  defaultValue: string;
+type TabsProps = {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (v: string) => void;
   children: React.ReactNode;
-}) {
-  const [value, setValue] = useState(defaultValue);
+};
+
+export function Tabs({
+  value: controlledValue,
+  defaultValue,
+  onValueChange,
+  children,
+}: TabsProps) {
+  const [internalValue, setInternalValue] = useState(defaultValue || "");
+
+  const isControlled = controlledValue !== undefined;
+
+  const value = isControlled ? controlledValue : internalValue;
+
+  const setValue = (v: string) => {
+    if (!isControlled) {
+      setInternalValue(v);
+    }
+    onValueChange?.(v);
+  };
 
   return (
     <TabsContext.Provider value={{ value, setValue }}>
@@ -57,6 +74,7 @@ export function TabsTrigger({
   return (
     <button
       onClick={() => setValue(value)}
+      data-state={isActive ? "active" : "inactive"}
       className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus:outline-none ${
         isActive
           ? "bg-white text-black shadow-sm"
@@ -81,7 +99,11 @@ export function TabsContent({
   if (active !== value) return null;
 
   return (
-    <div className={`mt-2 focus:outline-none ${className}`} {...props}>
+    <div
+      data-state="active"
+      className={`mt-2 focus:outline-none ${className}`}
+      {...props}
+    >
       {children}
     </div>
   );
