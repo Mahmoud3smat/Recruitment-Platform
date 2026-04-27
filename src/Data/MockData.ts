@@ -127,7 +127,7 @@ export const teamMembers = [
   {
     name: "Mahmoud Esmat",
     role: "Team Leader & Frontend Engineer",
-    bio: "BSc in Electrical Engineering (Communications & Electronics). Passionate about building scalable web applications.",
+    bio: "BSc in Electrical Engineering (ECE). Passionate about building scalable web applications.",
     isLeader: true,
     linkedin: "https://www.linkedin.com/in/mahmoud-esmat-120a0b24a",
     facebook: "https://www.facebook.com/share/1JK6kKge6a/",
@@ -147,7 +147,7 @@ export const teamMembers = [
     bio: "Specializes in Node.js and database architecture. Loves building robust APIs.",
     linkedin: "https://linkedin.com",
     facebook: "https://facebook.com",
-    whatsapp: "https://wa.me/",
+    whatsapp: "https://wa.me/201022280348",
   },
   {
     name: "Yasmin Medhat",

@@ -17,6 +17,7 @@ import { Login } from "@/Pages/Login";
 import { Register } from "@/Pages/Register";
 import { NotFound } from "@/Components/NotFound";
 import { SeekerDashboard } from "@/Pages/SeekerDashboard";
+import { CompanyDashboard } from "@/Pages/CompanyDashboard";
 
 const AppRoutes = () => (
   <div className="flex min-h-screen flex-col">
@@ -40,6 +41,7 @@ const AppRoutes = () => (
 
         {/* --------- Seeker & Company --------- */}
         <Route path="/seeker-dashboard" element={<SeekerDashboard />} />
+        <Route path="/company-dashboard" element={<CompanyDashboard />} />
 
         {/* --------- Not Found --------- */}
         <Route path="*" element={<NotFound />} />
