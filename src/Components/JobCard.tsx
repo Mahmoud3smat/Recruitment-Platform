@@ -5,7 +5,7 @@ import { Button } from "@/Components/button";
 import { motion } from "framer-motion";
 
 export interface Job {
-  id: string;
+  _id: string;
   title: string;
   company: string;
   location: string;
@@ -83,7 +83,7 @@ const JobCard = ({ job, index = 0 }: { job: Job; index?: number }) => (
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Bookmark className="h-4 w-4" />
             </Button>
-            <Link to={`/jobs/${job.id}`}>
+            <Link to={`/jobs/${job._id}`}>
               <Button size="sm">Apply</Button>
             </Link>
           </div>

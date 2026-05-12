@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Input } from "@/Components/input";
 import {
   Select,
@@ -10,8 +10,8 @@ import {
 import { Button } from "@/Components/button";
 import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
 import JobCard from "@/Components/JobCard";
-import { mockJobs, jobCategories } from "@/Data/MockData";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const locations = [
   "All Locations",
@@ -51,6 +51,30 @@ const sortOptions = [
   "Salary: Low to High",
 ];
 
+interface Job {
+  _id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  salary: string;
+  category: string;
+  postedAt: string;
+  experience: string;
+  skills: string[];
+  description: string;
+  benefits: string[];
+  isSaved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface JobsResponse {
+  success: boolean;
+  count: number;
+  data: Job[];
+}
+
 export const Jobs = () => {
   const [search, setSearch] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
@@ -61,6 +85,27 @@ export const Jobs = () => {
   const [salaryRange, setSalaryRange] = useState("All Ranges");
   const [sort, setSort] = useState("Newest First");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await axios.get<JobsResponse>(
+          "http://localhost:5000/api/jobs",
+        );
+
+        setJobs(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   const hasActiveFilters =
     location !== "All Locations" ||
@@ -77,8 +122,10 @@ export const Jobs = () => {
     setCategory("all");
   };
 
+  const jobCategories = [...new Set(jobs.map((job) => job.category))];
+
   const filtered = useMemo(() => {
-    let jobs = mockJobs.filter((job) => {
+    let filteredJobs = jobs.filter((job) => {
       const matchSearch =
         !search ||
         job.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -117,21 +164,22 @@ export const Jobs = () => {
     });
 
     if (sort === "Salary: High to Low") {
-      jobs = [...jobs].sort((a, b) => {
+      filteredJobs = [...filteredJobs].sort((a, b) => {
         const aNum = parseInt(a.salary.replace(/[^0-9]/g, ""));
         const bNum = parseInt(b.salary.replace(/[^0-9]/g, ""));
         return bNum - aNum;
       });
     } else if (sort === "Salary: Low to High") {
-      jobs = [...jobs].sort((a, b) => {
+      filteredJobs = [...filteredJobs].sort((a, b) => {
         const aNum = parseInt(a.salary.replace(/[^0-9]/g, ""));
         const bNum = parseInt(b.salary.replace(/[^0-9]/g, ""));
         return aNum - bNum;
       });
     }
 
-    return jobs;
+    return filteredJobs;
   }, [
+    jobs,
     search,
     locationSearch,
     location,
@@ -252,6 +300,10 @@ export const Jobs = () => {
       </div>
     </div>
   );
+
+  if (loading) {
+    return <div className="py-20 text-center">Loading jobs...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -456,7 +508,7 @@ export const Jobs = () => {
           ) : (
             <div className="space-y-4">
               {filtered.map((job, i) => (
-                <JobCard key={job.id} job={job} index={i} />
+                <JobCard key={job._id} job={job} index={i} />
               ))}
             </div>
           )}
