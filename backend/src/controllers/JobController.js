@@ -31,6 +31,37 @@ const getJobs = async (req, res) => {
 };
 
 /**
+ * GET /api/jobs/filters/options
+ * Get dynamic filter options from jobs collection
+ */
+const getJobFilterOptions = async (req, res) => {
+  try {
+    const types = await Job.distinct("type");
+    const categories = await Job.distinct("category");
+    const experienceLevels = await Job.distinct("experience");
+    const salaryRanges = await Job.distinct("salary");
+    const locations = await Job.distinct("location");
+
+    res.status(200).json({
+      success: true,
+      data: {
+        types,
+        categories,
+        experienceLevels,
+        salaryRanges,
+        locations,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch job filter options",
+      error: error.message,
+    });
+  }
+};
+
+/**
  * GET /api/jobs/:id
  * Get single job by id
  */
@@ -146,4 +177,5 @@ module.exports = {
   createJob,
   updateJob,
   deleteJob,
+  getJobFilterOptions,
 };
