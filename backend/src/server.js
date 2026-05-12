@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 const jobRoutes = require("./routes/jobRoutes");
+const teamMemberRoutes = require("./routes/teamMemberRoutes");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/jobs", jobRoutes);
+app.use("/api/team-members", teamMemberRoutes);
 
 const PORT = process.env.PORT || 5000;
 

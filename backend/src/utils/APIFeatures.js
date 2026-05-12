@@ -4,17 +4,16 @@ class APIFeatures {
     this.queryString = queryString;
   }
 
-  search() {
+  search(searchFields = ["title", "company", "description", "skills"]) {
     if (this.queryString.search) {
       const keyword = this.queryString.search.trim();
 
+      const searchConditions = searchFields.map((field) => ({
+        [field]: { $regex: keyword, $options: "i" },
+      }));
+
       this.query = this.query.find({
-        $or: [
-          { title: { $regex: keyword, $options: "i" } },
-          { company: { $regex: keyword, $options: "i" } },
-          { description: { $regex: keyword, $options: "i" } },
-          { skills: { $regex: keyword, $options: "i" } },
-        ],
+        $or: searchConditions,
       });
     }
 
@@ -27,12 +26,11 @@ class APIFeatures {
     const excludeFields = ["search", "sort", "limit", "page", "fields"];
     excludeFields.forEach((field) => delete queryObj[field]);
 
-    if (queryObj.location) {
-      queryObj.location = {
-        $regex: queryObj.location,
-        $options: "i",
-      };
-    }
+    Object.keys(queryObj).forEach((key) => {
+      if (typeof queryObj[key] === "string" && queryObj[key].includes(",")) {
+        queryObj[key] = { $in: queryObj[key].split(",") };
+      }
+    });
 
     let queryStr = JSON.stringify(queryObj);
 
