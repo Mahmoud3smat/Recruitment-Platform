@@ -21,7 +21,6 @@ const router = express.Router();
 /**
  * IMPORTANT:
  * Put this route before "/:id"
- * لأن Express لو شاف /:id الأول هيعتبر filters كأنه id
  */
 router.get("/filters/options", getJobFilterOptions);
 

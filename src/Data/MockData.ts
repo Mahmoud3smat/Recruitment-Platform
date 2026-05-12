@@ -123,50 +123,6 @@ export const mockJobs: Job[] = [
   },
 ];
 
-export const teamMembers = [
-  {
-    name: "Mahmoud Esmat",
-    role: "Team Leader & Frontend Engineer",
-    bio: "BSc in Electrical Engineering (ECE). Passionate about building scalable web applications.",
-    isLeader: true,
-    linkedin: "https://www.linkedin.com/in/mahmoud-esmat-120a0b24a",
-    facebook: "https://www.facebook.com/share/1JK6kKge6a/",
-    whatsapp: "https://wa.me/201012069129",
-  },
-  {
-    name: "Mohamed Kamel",
-    role: "Frontend Developer | Login & Register",
-    bio: "Creates intuitive and beautiful user experiences with attention to every detail.",
-    linkedin: "https://linkedin.com",
-    facebook: "https://facebook.com",
-    whatsapp: "https://wa.me/",
-  },
-  {
-    name: "Amany Ahmed",
-    role: "Frontend Developer | Jobs & Job details",
-    bio: "Specializes in Node.js and database architecture. Loves building robust APIs.",
-    linkedin: "https://linkedin.com",
-    facebook: "https://facebook.com",
-    whatsapp: "https://wa.me/201022280348",
-  },
-  {
-    name: "Yasmin Medhat",
-    role: "Frontend Developer | Company Dashboard",
-    bio: "React enthusiast who builds pixel-perfect responsive interfaces.",
-    linkedin: "https://linkedin.com",
-    facebook: "https://facebook.com",
-    whatsapp: "https://wa.me/",
-  },
-  {
-    name: "Fawzia Yasser",
-    role: "Frontend Developer | Seeker Dashboard",
-    bio: "Comfortable across the entire stack. Bridges the gap between frontend and backend.",
-    linkedin: "https://www.linkedin.com/in/fawzia-yasser-177852235",
-    facebook: "https://facebook.com",
-    whatsapp: "https://wa.me/201287292585",
-  },
-];
-
 export const jobCategories = [
   "Frontend",
   "Backend",
