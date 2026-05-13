@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 import { Button } from "@/Components/button";
 import { Input } from "@/Components/input";
@@ -39,7 +39,7 @@ import {
   Star,
   X,
 } from "lucide-react";
-import { jobCategories, mockCandidates } from "@/Data/MockData";
+import { mockCandidates } from "@/Data/MockData";
 import { toast } from "sonner";
 
 interface JobPosting {
@@ -137,6 +137,23 @@ export const CompanyDashboard = () => {
   const [candidateSearch, setCandidateSearch] = useState("");
   const [candidateLocationFilter, setCandidateLocationFilter] = useState("all");
   const [customField, setCustomField] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("YOUR_API_URL/categories");
+        const data = await res.json();
+
+        setCategories(data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load categories");
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleCreatePost = () => {
     if (!newPosting.title || !newPosting.category || !newPosting.location) {
@@ -188,12 +205,12 @@ export const CompanyDashboard = () => {
   };
 
   const addCustomCategory = () => {
-    if (customField.trim() && !jobCategories.includes(customField.trim())) {
-      jobCategories.push(customField.trim());
+    if (customField.trim() && !categories.includes(customField.trim())) {
+      categories.push(customField.trim());
       setNewPosting({ ...newPosting, category: customField.trim() });
       setCustomField("");
       toast.success("New field added!");
-    } else if (jobCategories.includes(customField.trim())) {
+    } else if (categories.includes(customField.trim())) {
       toast.error("This field already exists");
     }
   };
@@ -516,7 +533,7 @@ export const CompanyDashboard = () => {
                             <SelectValue placeholder="Select field" />
                           </SelectTrigger>
                           <SelectContent>
-                            {jobCategories.map((c) => (
+                            {categories.map((c) => (
                               <SelectItem key={c} value={c}>
                                 {c}
                               </SelectItem>

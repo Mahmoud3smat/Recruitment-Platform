@@ -9,12 +9,61 @@ import {
   Building2,
   CheckCircle,
 } from "lucide-react";
-import { mockJobs } from "@/Data/MockData";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+
+interface Job {
+  _id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  salary: string;
+  category: string;
+  postedAt: string;
+  experience: string;
+  skills: string[];
+  description: string;
+  benefits: string[];
+  isSaved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface JobResponse {
+  success: boolean;
+  data: Job;
+}
 
 export const JobDetail = () => {
   const { id } = useParams();
-  const job = mockJobs.find((j) => j.id === id);
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const response = await axios.get<JobResponse>(
+          `http://localhost:5000/api/jobs/${id}`,
+        );
+
+        setJob(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch job:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJob();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">Loading...</div>
+    );
+  }
 
   if (!job) {
     return (
