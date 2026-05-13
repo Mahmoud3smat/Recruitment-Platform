@@ -1,8 +1,13 @@
-import { Badge } from "@/Components/badge";
-import { motion } from "framer-motion";
+// React Libraries
 import { Linkedin, Facebook, MessageCircle, Crown } from "lucide-react";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import axios from "axios";
+
+// Animations
+import { motion } from "framer-motion";
+
+// Components
+import { Badge } from "@/Components/badge";
 
 interface TeamMember {
   name: string;

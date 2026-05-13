@@ -1,6 +1,11 @@
+// Reacts Libraries
 import { Link } from "react-router-dom";
-import { Button } from "@/Components/button";
 import { Target, Heart, Globe, ArrowRight } from "lucide-react";
+
+// Components
+import { Button } from "@/Components/button";
+
+// Animations
 import { motion } from "framer-motion";
 
 const values = [

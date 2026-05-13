@@ -1,5 +1,14 @@
+// React Libraries
 import { useState, useMemo } from "react";
+
+// Animations
+import { motion } from "framer-motion";
+
+// Components
+import { Button } from "@/Components/button";
 import { Input } from "@/Components/input";
+import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
+import JobCard from "@/Components/JobCard";
 import {
   Select,
   SelectContent,
@@ -7,10 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/select";
-import { Button } from "@/Components/button";
-import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
-import JobCard from "@/Components/JobCard";
-import { motion } from "framer-motion";
+
+// Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 
 const locations = [

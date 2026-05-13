@@ -1,4 +1,25 @@
-import { useEffect, useState } from "react";
+// React Libraries
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  Building2,
+  Briefcase,
+  Users,
+  MapPin,
+  Edit,
+  Save,
+  Plus,
+  Trash2,
+  Clock,
+  DollarSign,
+  CalendarDays,
+  AlertTriangle,
+  Search,
+  Star,
+  X,
+} from "lucide-react";
+
+// Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 import { Button } from "@/Components/button";
 import { Input } from "@/Components/input";
@@ -22,25 +43,11 @@ import {
 } from "@/Components/dialog";
 import { Checkbox } from "@/Components/checkbox";
 import { motion } from "framer-motion";
-import {
-  Building2,
-  Briefcase,
-  Users,
-  MapPin,
-  Edit,
-  Save,
-  Plus,
-  Trash2,
-  Clock,
-  DollarSign,
-  CalendarDays,
-  AlertTriangle,
-  Search,
-  Star,
-  X,
-} from "lucide-react";
+
+// Data
 import { JobPosting, mockCandidates } from "@/Data/MockData";
-import { toast } from "sonner";
+
+// Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 
 const benefitOptions = [

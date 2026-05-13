@@ -1,4 +1,11 @@
+// React Libraries
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+
+// Animations
+import { motion } from "framer-motion";
+
+// Components
 import { Button } from "@/Components/button";
 import { Badge } from "@/Components/badge";
 import {
@@ -10,8 +17,8 @@ import {
   CheckCircle,
 } from "lucide-react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+
+// Data
 import { Job } from "@/Data/MockData";
 
 interface JobResponse {

@@ -1,5 +1,11 @@
+// React Libraries
 import { Link } from "react-router-dom";
+
+// Components
 import { Button } from "@/Components/button";
+import JobCard from "@/Components/JobCard";
+
+// Icons
 import {
   ArrowRight,
   Search,
@@ -9,9 +15,14 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
+
+// Animations
 import { motion } from "framer-motion";
+
+// Images
 import heroBg from "@/assets/hero-bg.jpg";
-import JobCard from "@/Components/JobCard";
+
+// Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 
 const features = [

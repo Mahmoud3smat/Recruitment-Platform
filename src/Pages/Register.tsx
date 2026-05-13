@@ -1,5 +1,13 @@
-import { useEffect, useState } from "react";
+// React Libraries
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Briefcase, User, Building2 } from "lucide-react";
+import { toast } from "sonner";
+
+// Animations
+import { motion } from "framer-motion";
+
+// Components
 import { Button } from "@/Components/button";
 import { Input } from "@/Components/input";
 import { Label } from "@/Components/label";
@@ -11,10 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/select";
-import { Briefcase, User, Building2 } from "lucide-react";
-import { motion } from "framer-motion";
-import { toast } from "sonner";
+
+// Context Hooks
 import { useAuth } from "@/Contexts/AuthContext";
+
+// Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 
 export const Register = () => {

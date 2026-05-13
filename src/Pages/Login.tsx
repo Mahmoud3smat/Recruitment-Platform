@@ -1,12 +1,19 @@
+// React Libraries
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Briefcase, User, Building2 } from "lucide-react";
+import { toast } from "sonner";
+
+// Animations
+import { motion } from "framer-motion";
+
+// Components
 import { Button } from "@/Components/button";
 import { Input } from "@/Components/input";
 import { Label } from "@/Components/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
-import { Briefcase, User, Building2 } from "lucide-react";
-import { motion } from "framer-motion";
-import { toast } from "sonner";
+
+// Contexts Hooks
 import { useAuth } from "@/Contexts/AuthContext";
 
 export const Login = () => {

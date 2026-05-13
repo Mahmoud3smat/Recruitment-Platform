@@ -1,25 +1,6 @@
+// React Libraries
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
-import { Button } from "@/Components/button";
-import { Input } from "@/Components/input";
-import { Label } from "@/Components/label";
-import { Badge } from "@/Components/badge";
-import { Textarea } from "@/Components/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/Components/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/Components/dialog";
-import { motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   User,
   Briefcase,
@@ -35,21 +16,49 @@ import {
   Save,
   X,
 } from "lucide-react";
+
+// Animations
+import { motion } from "framer-motion";
+
+// Components
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
+import { Button } from "@/Components/button";
+import { Input } from "@/Components/input";
+import { Label } from "@/Components/label";
+import { Badge } from "@/Components/badge";
+import { Textarea } from "@/Components/textarea";
 import JobCard from "@/Components/JobCard";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/Components/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/Components/dialog";
+
+// Data
 import { skillTests, courses } from "@/Data/MockData";
-import { toast } from "sonner";
+
+// Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 
 export const SeekerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: "Fawzia Yasser",
-    email: "fawziayasser@gmail.com",
+    name: "Mahmoud Esmat",
+    email: "mahmoudesmat20029@gmail.com",
     title: "Frontend Engineer",
     location: "Cairo, Egypt",
     experience: "3 years",
-    education: " (Communications & Electronics) Helwan Universty",
+    education: " (Communications & Electronics) Zagazig Universty",
     skills: ["React", "TypeScript", "Tailwind CSS", "JavaScript", "HTML/CSS"],
     certifications: ["AWS Certified Developer", "Meta Frontend Certificate"],
     preferredField: "Frontend",

@@ -1,5 +1,8 @@
+// React Libraries
 import { useEffect, useState } from "react";
 import axios from "axios";
+
+// Data
 import { Job } from "@/Data/MockData";
 
 export const useJobs = () => {
