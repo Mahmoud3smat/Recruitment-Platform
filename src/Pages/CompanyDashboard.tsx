@@ -39,24 +39,9 @@ import {
   Star,
   X,
 } from "lucide-react";
-import { mockCandidates } from "@/Data/MockData";
+import { JobPosting, mockCandidates } from "@/Data/MockData";
 import { toast } from "sonner";
-
-interface JobPosting {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  location: string;
-  type: string;
-  salaryMin: string;
-  salaryMax: string;
-  workHours: string;
-  benefits: string[];
-  expiryDate: string;
-  active: boolean;
-  createdAt: string;
-}
+import { useJobs } from "@/Hooks/useJobs";
 
 const benefitOptions = [
   "Housing Allowance",
@@ -137,23 +122,7 @@ export const CompanyDashboard = () => {
   const [candidateSearch, setCandidateSearch] = useState("");
   const [candidateLocationFilter, setCandidateLocationFilter] = useState("all");
   const [customField, setCustomField] = useState("");
-  const [categories, setCategories] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("YOUR_API_URL/categories");
-        const data = await res.json();
-
-        setCategories(data);
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to load categories");
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  const { jobCategories } = useJobs();
 
   const handleCreatePost = () => {
     if (!newPosting.title || !newPosting.category || !newPosting.location) {
@@ -205,12 +174,12 @@ export const CompanyDashboard = () => {
   };
 
   const addCustomCategory = () => {
-    if (customField.trim() && !categories.includes(customField.trim())) {
-      categories.push(customField.trim());
+    if (customField.trim() && !jobCategories.includes(customField.trim())) {
+      jobCategories.push(customField.trim());
       setNewPosting({ ...newPosting, category: customField.trim() });
       setCustomField("");
       toast.success("New field added!");
-    } else if (categories.includes(customField.trim())) {
+    } else if (jobCategories.includes(customField.trim())) {
       toast.error("This field already exists");
     }
   };
@@ -533,7 +502,7 @@ export const CompanyDashboard = () => {
                             <SelectValue placeholder="Select field" />
                           </SelectTrigger>
                           <SelectContent>
-                            {categories.map((c) => (
+                            {jobCategories.map((c) => (
                               <SelectItem key={c} value={c}>
                                 {c}
                               </SelectItem>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "@/Components/input";
 import {
   Select,
@@ -11,7 +11,7 @@ import { Button } from "@/Components/button";
 import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
 import JobCard from "@/Components/JobCard";
 import { motion } from "framer-motion";
-import axios from "axios";
+import { useJobs } from "@/Hooks/useJobs";
 
 const locations = [
   "All Locations",
@@ -51,30 +51,6 @@ const sortOptions = [
   "Salary: Low to High",
 ];
 
-interface Job {
-  _id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  salary: string;
-  category: string;
-  postedAt: string;
-  experience: string;
-  skills: string[];
-  description: string;
-  benefits: string[];
-  isSaved: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface JobsResponse {
-  success: boolean;
-  count: number;
-  data: Job[];
-}
-
 export const Jobs = () => {
   const [search, setSearch] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
@@ -85,27 +61,7 @@ export const Jobs = () => {
   const [salaryRange, setSalaryRange] = useState("All Ranges");
   const [sort, setSort] = useState("Newest First");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await axios.get<JobsResponse>(
-          "http://localhost:5000/api/jobs",
-        );
-
-        setJobs(response.data.data);
-      } catch (error) {
-        console.error("Failed to fetch jobs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
+  const { jobs, loading } = useJobs();
 
   const hasActiveFilters =
     location !== "All Locations" ||

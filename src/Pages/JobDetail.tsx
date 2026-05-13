@@ -12,24 +12,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
-interface Job {
-  _id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  salary: string;
-  category: string;
-  postedAt: string;
-  experience: string;
-  skills: string[];
-  description: string;
-  benefits: string[];
-  isSaved: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Job } from "@/Data/MockData";
 
 interface JobResponse {
   success: boolean;

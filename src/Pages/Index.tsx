@@ -12,8 +12,7 @@ import {
 import { motion } from "framer-motion";
 import heroBg from "@/assets/hero-bg.jpg";
 import JobCard from "@/Components/JobCard";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useJobs } from "@/Hooks/useJobs";
 
 const features = [
   {
@@ -55,51 +54,8 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-interface Job {
-  _id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  salary: string;
-  category: string;
-  postedAt: string;
-  experience: string;
-  skills: string[];
-  description: string;
-  benefits: string[];
-  isSaved: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface JobsResponse {
-  success: boolean;
-  count: number;
-  data: Job[];
-}
-
 export const Index = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await axios.get<JobsResponse>(
-          "http://localhost:5000/api/jobs",
-        );
-
-        setJobs(response.data.data);
-      } catch (error) {
-        console.error("Failed to fetch jobs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
+  const { jobs, loading } = useJobs();
 
   if (loading) {
     return <div className="py-20 text-center">Loading...</div>;

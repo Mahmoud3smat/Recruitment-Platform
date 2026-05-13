@@ -14,16 +14,8 @@ import {
 import { Briefcase, User, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import axios from "axios";
 import { useAuth } from "@/Contexts/AuthContext";
-
-interface Job {
-  category: string;
-}
-
-interface JobsResponse {
-  data: Job[];
-}
+import { useJobs } from "@/Hooks/useJobs";
 
 export const Register = () => {
   const [seekerData, setSeekerData] = useState({
@@ -42,29 +34,7 @@ export const Register = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [jobCategories, setJobCategories] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await axios.get<JobsResponse>(
-          "http://localhost:5000/api/jobs",
-        );
-
-        const jobs = response.data.data;
-
-        const categories: string[] = [
-          ...new Set(jobs.map((job: Job) => job.category)),
-        ];
-
-        setJobCategories(categories);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-
-    fetchJobs();
-  }, []);
+  const { jobCategories } = useJobs();
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-10">

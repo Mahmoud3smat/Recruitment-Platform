@@ -1,3 +1,43 @@
+export interface JobPosting {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  location: string;
+  type: string;
+  salaryMin: string;
+  salaryMax: string;
+  workHours: string;
+  benefits: string[];
+  expiryDate: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface Job {
+  _id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  salary: string;
+  category: string;
+  postedAt: string;
+  experience: string;
+  skills: string[];
+  description: string;
+  benefits: string[];
+  isSaved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface JobsResponse {
+  success: boolean;
+  count: number;
+  data: Job[];
+}
+
 export const skillTests = [
   {
     id: "t1",

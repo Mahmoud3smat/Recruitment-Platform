@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 import { Button } from "@/Components/button";
 import { Input } from "@/Components/input";
@@ -38,31 +38,7 @@ import {
 import JobCard from "@/Components/JobCard";
 import { skillTests, courses } from "@/Data/MockData";
 import { toast } from "sonner";
-import axios from "axios";
-
-interface Job {
-  _id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  salary: string;
-  category: string;
-  postedAt: string;
-  experience: string;
-  skills: string[];
-  description: string;
-  benefits: string[];
-  isSaved: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface JobsResponse {
-  success: boolean;
-  count: number;
-  data: Job[];
-}
+import { useJobs } from "@/Hooks/useJobs";
 
 export const SeekerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -82,32 +58,7 @@ export const SeekerDashboard = () => {
   const [newSkill, setNewSkill] = useState("");
   const [testDialog, setTestDialog] = useState<string | null>(null);
   const [enrollDialog, setEnrollDialog] = useState<string | null>(null);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [jobCategories, setJobCategories] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await axios.get<JobsResponse>(
-          "http://localhost:5000/api/jobs",
-        );
-
-        const jobsData = response.data.data;
-
-        setJobs(jobsData);
-
-        const categories: string[] = [
-          ...new Set(jobsData.map((job) => job.category)),
-        ];
-
-        setJobCategories(categories);
-      } catch (error) {
-        console.error("Failed to fetch jobs:", error);
-      }
-    };
-
-    fetchJobs();
-  }, []);
+  const { jobs, jobCategories } = useJobs();
 
   const recommendedJobs = jobs.filter(
     (j) =>
