@@ -6,7 +6,8 @@ const connectDB = require("./config/db");
 
 const jobRoutes = require("./routes/jobRoutes");
 const teamMemberRoutes = require("./routes/teamMemberRoutes");
-const jobCategoryRoutes = require("./routes/jobCategoryRoutes");
+const courseRoutes = require("./routes/courseRoutes");
+const skillTestRoutes = require("./routes/skillTestRoutes");
 const app = express();
 
 connectDB();
@@ -22,8 +23,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/jobs", jobRoutes);
 app.use("/api/team-members", teamMemberRoutes);
-app.use("/api/job-categories", jobCategoryRoutes);
-
+app.use("/api/courses", courseRoutes);
+app.use("/api/skill-tests", skillTestRoutes);
+const candidateRoutes = require("./routes/candidateRoutes");
+app.use("/api/candidates", candidateRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

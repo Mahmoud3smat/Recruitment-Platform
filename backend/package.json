@@ -8,7 +8,10 @@
     "start": "node src/server.js",
     "seed:jobs": "node src/seed/seedJobs.js",
     "seed:team-members": "node src/seed/seedTeamMembers.js",
-    "seed:job-categories": "node src/seed/seedJobCategories.js"
+    "seed:job-categories": "node src/seed/seedJobCategories.js",
+    "seed:courses": "node src/seed/seedCourses.js",
+    "seed:skill-tests": "node src/seed/seedSkillTests.js",
+    "seed:candidates": "node src/seed/seedCandidates.js"
   },
   "keywords": [],
   "author": "",
