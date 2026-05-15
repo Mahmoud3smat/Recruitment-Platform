@@ -1,5 +1,6 @@
 // React Libraries
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { toast } from "sonner";
 import {
   User,
@@ -44,7 +45,7 @@ import {
 } from "@/Components/dialog";
 
 // Data
-import { skillTests, courses } from "@/Data/MockData";
+import { skillTests, Course } from "@/Data/MockData";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
@@ -68,6 +69,32 @@ export const SeekerDashboard = () => {
   const [testDialog, setTestDialog] = useState<string | null>(null);
   const [enrollDialog, setEnrollDialog] = useState<string | null>(null);
   const { jobs, jobCategories } = useJobs();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoadingCourses(true);
+
+        const API_URL = "http://localhost:5000/api/courses";
+        const response = await axios.get<{
+          success: boolean;
+          count: number;
+          data: Course[];
+        }>(API_URL);
+
+        setCourses(response.data.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load courses");
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const recommendedJobs = jobs.filter(
     (j) =>
@@ -184,7 +211,11 @@ export const SeekerDashboard = () => {
               <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                 Recommended for You
               </h2>
-              {recommendedJobs.length === 0 ? (
+              {loadingCourses ? (
+                <p className="text-muted-foreground">Loading courses...</p>
+              ) : courses.length === 0 ? (
+                <p className="text-muted-foreground">No courses available.</p>
+              ) : recommendedJobs.length === 0 ? (
                 <p className="text-muted-foreground">
                   Update your profile to get personalized recommendations.
                 </p>
@@ -484,112 +515,118 @@ export const SeekerDashboard = () => {
               Enroll in courses to sharpen your skills and boost your career
               prospects.
             </p>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {courses.map((course, i) => (
-                <motion.div
-                  key={course.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="rounded-xl border border-border bg-card p-5 card-elevated"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <Badge variant="secondary">{course.category}</Badge>
-                    <div className="flex items-center gap-1 text-sm text-accent">
-                      <Star className="h-3.5 w-3.5 fill-current" />{" "}
-                      {course.rating}
-                    </div>
-                  </div>
-                  <h3 className="font-display text-lg font-semibold text-card-foreground">
-                    {course.title}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    by {course.instructor}
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {course.description}
-                  </p>
-                  <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" /> {course.duration}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <BookOpen className="h-3.5 w-3.5" /> {course.lessons}{" "}
-                      lessons
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users className="h-3.5 w-3.5" />{" "}
-                      {course.enrolled.toLocaleString()}
-                    </span>
-                  </div>
-                  <Dialog
-                    open={enrollDialog === course.id}
-                    onOpenChange={(o) => setEnrollDialog(o ? course.id : null)}
+            {loadingCourses ? (
+              <p className="text-muted-foreground">Loading courses...</p>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {courses.map((course, i) => (
+                  <motion.div
+                    key={course._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="rounded-xl border border-border bg-card p-5 card-elevated"
                   >
-                    <DialogTrigger asChild>
-                      <Button className="mt-4 w-full gap-2">
-                        <GraduationCap className="h-4 w-4" /> Enroll Now
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle className="font-display">
-                          {course.title}
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <p className="text-muted-foreground">
-                          {course.description}
-                        </p>
-                        <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              Instructor:
-                            </span>
-                            <span className="font-medium text-foreground">
-                              {course.instructor}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              Duration:
-                            </span>
-                            <span className="font-medium text-foreground">
-                              {course.duration}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              Level:
-                            </span>
-                            <span className="font-medium text-foreground">
-                              {course.level}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              Enrolled:
-                            </span>
-                            <span className="font-medium text-foreground">
-                              {course.enrolled.toLocaleString()} students
-                            </span>
-                          </div>
-                        </div>
-                        <Button
-                          className="w-full"
-                          onClick={() => {
-                            setEnrollDialog(null);
-                            toast.success(`Enrolled in "${course.title}" 🎓`);
-                          }}
-                        >
-                          Confirm Enrollment
-                        </Button>
+                    <div className="flex items-start justify-between mb-3">
+                      <Badge variant="secondary">{course.category}</Badge>
+                      <div className="flex items-center gap-1 text-sm text-accent">
+                        <Star className="h-3.5 w-3.5 fill-current" />{" "}
+                        {course.rating}
                       </div>
-                    </DialogContent>
-                  </Dialog>
-                </motion.div>
-              ))}
-            </div>
+                    </div>
+                    <h3 className="font-display text-lg font-semibold text-card-foreground">
+                      {course.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      by {course.instructor}
+                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {course.description}
+                    </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" /> {course.duration}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <BookOpen className="h-3.5 w-3.5" /> {course.lessons}{" "}
+                        lessons
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Users className="h-3.5 w-3.5" />{" "}
+                        {course.enrolled.toLocaleString()}
+                      </span>
+                    </div>
+                    <Dialog
+                      open={enrollDialog === course._id}
+                      onOpenChange={(o) =>
+                        setEnrollDialog(o ? course._id : null)
+                      }
+                    >
+                      <DialogTrigger asChild>
+                        <Button className="mt-4 w-full gap-2">
+                          <GraduationCap className="h-4 w-4" /> Enroll Now
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle className="font-display">
+                            {course.title}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <p className="text-muted-foreground">
+                            {course.description}
+                          </p>
+                          <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Instructor:
+                              </span>
+                              <span className="font-medium text-foreground">
+                                {course.instructor}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Duration:
+                              </span>
+                              <span className="font-medium text-foreground">
+                                {course.duration}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Level:
+                              </span>
+                              <span className="font-medium text-foreground">
+                                {course.level}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Enrolled:
+                              </span>
+                              <span className="font-medium text-foreground">
+                                {course.enrolled.toLocaleString()} students
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            className="w-full"
+                            onClick={() => {
+                              setEnrollDialog(null);
+                              toast.success(`Enrolled in "${course.title}" 🎓`);
+                            }}
+                          >
+                            Confirm Enrollment
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </motion.div>
