@@ -45,7 +45,7 @@ import {
 } from "@/Components/dialog";
 
 // Data
-import { skillTests, Course } from "@/Data/MockData";
+import { Course, SkillTest } from "@/Data/MockData";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
@@ -71,6 +71,8 @@ export const SeekerDashboard = () => {
   const { jobs, jobCategories } = useJobs();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [skillTests, setSkillTests] = useState<SkillTest[]>([]);
+  const [loadingTests, setLoadingTests] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -94,6 +96,29 @@ export const SeekerDashboard = () => {
     };
 
     fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    const fetchSkillTests = async () => {
+      try {
+        setLoadingTests(true);
+
+        const response = await axios.get<{
+          success: boolean;
+          count: number;
+          data: SkillTest[];
+        }>("http://localhost:5000/api/skill-tests");
+
+        setSkillTests(response.data.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load skill tests");
+      } finally {
+        setLoadingTests(false);
+      }
+    };
+
+    fetchSkillTests();
   }, []);
 
   const recommendedJobs = jobs.filter(
@@ -415,94 +440,100 @@ export const SeekerDashboard = () => {
               employers.
             </p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {skillTests.map((test, i) => (
-                <motion.div
-                  key={test.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="rounded-xl border border-border bg-card p-5 card-elevated"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <Badge variant="secondary">{test.category}</Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {test.difficulty}
-                    </Badge>
-                  </div>
-                  <h3 className="font-display text-lg font-semibold text-card-foreground">
-                    {test.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {test.description}
-                  </p>
-                  <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <CheckCircle className="h-3.5 w-3.5" /> {test.questions}{" "}
-                      questions
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" /> {test.duration}
-                    </span>
-                  </div>
-                  <Dialog
-                    open={testDialog === test.id}
-                    onOpenChange={(o) => setTestDialog(o ? test.id : null)}
+              {loadingTests ? (
+                <p className="text-muted-foreground">Loading tests...</p>
+              ) : skillTests.length === 0 ? (
+                <p className="text-muted-foreground">No tests available.</p>
+              ) : (
+                skillTests.map((test, i) => (
+                  <motion.div
+                    key={test._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="rounded-xl border border-border bg-card p-5 card-elevated"
                   >
-                    <DialogTrigger asChild>
-                      <Button className="mt-4 w-full gap-2" variant="outline">
-                        <Play className="h-4 w-4" /> Start Test
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle className="font-display">
-                          {test.title}
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <p className="text-muted-foreground">
-                          {test.description}
-                        </p>
-                        <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              Questions:
-                            </span>
-                            <span className="font-medium text-foreground">
-                              {test.questions}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              Duration:
-                            </span>
-                            <span className="font-medium text-foreground">
-                              {test.duration}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              Difficulty:
-                            </span>
-                            <span className="font-medium text-foreground">
-                              {test.difficulty}
-                            </span>
-                          </div>
-                        </div>
-                        <Button
-                          className="w-full"
-                          onClick={() => {
-                            setTestDialog(null);
-                            toast.success("Test started! Good luck! 🎯");
-                          }}
-                        >
-                          Begin Assessment
+                    <div className="flex items-start justify-between mb-3">
+                      <Badge variant="secondary">{test.category}</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {test.difficulty}
+                      </Badge>
+                    </div>
+                    <h3 className="font-display text-lg font-semibold text-card-foreground">
+                      {test.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {test.description}
+                    </p>
+                    <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <CheckCircle className="h-3.5 w-3.5" /> {test.questions}{" "}
+                        questions
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" /> {test.duration}
+                      </span>
+                    </div>
+                    <Dialog
+                      open={testDialog === test._id}
+                      onOpenChange={(o) => setTestDialog(o ? test._id : null)}
+                    >
+                      <DialogTrigger asChild>
+                        <Button className="mt-4 w-full gap-2" variant="outline">
+                          <Play className="h-4 w-4" /> Start Test
                         </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </motion.div>
-              ))}
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle className="font-display">
+                            {test.title}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <p className="text-muted-foreground">
+                            {test.description}
+                          </p>
+                          <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Questions:
+                              </span>
+                              <span className="font-medium text-foreground">
+                                {test.questions}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Duration:
+                              </span>
+                              <span className="font-medium text-foreground">
+                                {test.duration}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Difficulty:
+                              </span>
+                              <span className="font-medium text-foreground">
+                                {test.difficulty}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            className="w-full"
+                            onClick={() => {
+                              setTestDialog(null);
+                              toast.success("Test started! Good luck! 🎯");
+                            }}
+                          >
+                            Begin Assessment
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </motion.div>
+                ))
+              )}
             </div>
           </TabsContent>
 
