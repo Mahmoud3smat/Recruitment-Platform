@@ -14,11 +14,6 @@ const jobSchema = new mongoose.Schema(
       trim: true,
     },
 
-    active: {
-      type: Boolean,
-      default: true,
-    },
-
     location: {
       type: String,
       required: true,
