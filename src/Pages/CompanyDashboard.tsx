@@ -113,7 +113,7 @@ export const CompanyDashboard = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loadingCandidates, setLoadingCandidates] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
-  const { jobs, loading, jobCategories } = useJobs();
+  const { jobs, loading, jobCategories, setJobCategories } = useJobs();
   const [company, setCompany] = useState(companyData);
   const [newPosting, setNewPosting] =
     useState<Omit<JobPosting, "_id" | "createdAt">>(newPostData);
@@ -201,11 +201,23 @@ export const CompanyDashboard = () => {
   };
 
   //! ------ Cancel any Post Functions ------
-  const cancelPosting = (id: string) => {
-    setPostings(
-      postings.map((p) => (p._id === id ? { ...p, active: false } : p)),
+  const cancelPosting = async (id: string) => {
+    const oldPostings = postings;
+
+    setPostings((prev) =>
+      prev.map((p) => (p._id === id ? { ...p, active: false } : p)),
     );
-    showToast("info", "Job posting cancelled");
+
+    try {
+      await axios.patch(`http://localhost:5000/api/jobs/${id}`, {
+        active: false,
+      });
+
+      showToast("info", "Job posting cancelled");
+    } catch (error) {
+      setPostings(oldPostings); // rollback
+      showToast("error", "Failed to cancel posting");
+    }
   };
 
   //! ------ Delete any Post Functions ------
@@ -233,7 +245,7 @@ export const CompanyDashboard = () => {
 
   const addCustomCategory = () => {
     if (customField.trim() && !jobCategories.includes(customField.trim())) {
-      jobCategories.push(customField.trim());
+      setJobCategories([...jobCategories, customField.trim()]);
       setNewPosting({ ...newPosting, category: customField.trim() });
       setCustomField("");
       showToast("success", "New field added!");

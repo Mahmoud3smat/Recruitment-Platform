@@ -2,14 +2,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 
-// -------------- Contexts --------------
+// Contexts
 import { AuthProvider } from "./Contexts/AuthContext";
 
-// -------------- Fixed Components --------------
+// Fixed Components
 import { Navbar } from "@/Components/Navbar";
 import { Footer } from "@/Components/Footer";
 
-// -------------- Pages --------------
+// Pages
 import { Index } from "@/Pages/Index";
 import { Jobs } from "@/Pages/Jobs";
 import { JobDetail } from "@/Pages/JobDetail";
@@ -57,7 +57,7 @@ const AppRoutes = () => (
 const App = () => (
   <BrowserRouter>
     <AuthProvider>
-      <Toaster richColors position="top-right" />
+      <Toaster richColors position="bottom-right" />
       <AppRoutes />
     </AuthProvider>
   </BrowserRouter>

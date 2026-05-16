@@ -3,7 +3,8 @@ const APIFeatures = require("../utils/apiFeatures");
 
 /**
  * GET /api/jobs
- * Get all jobs with search, filters, sort, fields, and pagination
+ * Fetch all jobs with support for:
+ * search, filters, sorting, field limiting, and pagination
  */
 const getJobs = async (req, res) => {
   try {
@@ -32,7 +33,7 @@ const getJobs = async (req, res) => {
 
 /**
  * GET /api/jobs/filters/options
- * Get dynamic filter options from jobs collection
+ * Returns distinct values for building filter UI
  */
 const getJobFilterOptions = async (req, res) => {
   try {
@@ -55,7 +56,7 @@ const getJobFilterOptions = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch job filter options",
+      message: "Failed to fetch filter options",
       error: error.message,
     });
   }
@@ -63,7 +64,7 @@ const getJobFilterOptions = async (req, res) => {
 
 /**
  * GET /api/jobs/:id
- * Get single job by id
+ * Fetch a single job by ID
  */
 const getJobById = async (req, res) => {
   try {
@@ -91,7 +92,7 @@ const getJobById = async (req, res) => {
 
 /**
  * POST /api/jobs
- * Create new job
+ * Create a new job
  */
 const createJob = async (req, res) => {
   try {
@@ -113,7 +114,7 @@ const createJob = async (req, res) => {
 
 /**
  * PUT /api/jobs/:id
- * Update job
+ * Update an existing job (full/partial update depending on schema)
  */
 const updateJob = async (req, res) => {
   try {
@@ -145,7 +146,7 @@ const updateJob = async (req, res) => {
 
 /**
  * DELETE /api/jobs/:id
- * Delete job
+ * Remove a job from the database
  */
 const deleteJob = async (req, res) => {
   try {
@@ -178,4 +179,34 @@ module.exports = {
   updateJob,
   deleteJob,
   getJobFilterOptions,
+};
+
+
+const patchJob = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        message: "Job not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Job updated successfully",
+      data: job,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Failed to update job",
+      error: error.message,
+    });
+  }
 };
