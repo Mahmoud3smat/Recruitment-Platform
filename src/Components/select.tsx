@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 type Option = {
   value: string;
@@ -52,33 +52,44 @@ export function Select({
 
 function useSelect() {
   const ctx = useContext(SelectContext);
-  if (!ctx) throw new Error("Select must be used inside Select");
+
+  if (!ctx) {
+    throw new Error("Select components must be used inside Select");
+  }
+
   return ctx;
 }
 
 // ---------- Trigger ----------
+type TriggerProps = React.HTMLAttributes<HTMLDivElement>;
+
 export function SelectTrigger({
   className = "",
   children,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  ...props
+}: TriggerProps) {
   const { open, setOpen, disabled } = useSelect();
 
   return (
     <div
+      {...props}
       onClick={() => {
         if (disabled) return;
         setOpen(!open);
       }}
-      className={`flex h-10 w-full items-center justify-between rounded-md border px-3 text-sm transition
+      className={`
+        flex h-10 w-full items-center justify-between
+        rounded-md border px-3 text-sm transition
         ${
           disabled
             ? "bg-gray-100 cursor-not-allowed opacity-60"
             : "bg-white cursor-pointer hover:border-gray-400"
         }
-        ${className}`}
+        ${className}
+      `}
     >
       {children}
-      <span className="ml-2">▼</span>
+      <span className="ml-2 text-xs">▼</span>
     </div>
   );
 }
@@ -89,51 +100,59 @@ export function SelectValue({
 }: {
   placeholder?: string;
 }) {
-  const { value, options } = useSelect();
+  const { value } = useSelect();
 
-  return (
-    <span className="truncate">
-      {options.find((o) => o.value === value)?.label || placeholder}
-    </span>
-  );
+  return <span className="truncate">{value || placeholder}</span>;
 }
 
 // ---------- Content ----------
-export function SelectContent({ children }: { children: React.ReactNode }) {
+type ContentProps = {
+  children: React.ReactNode;
+};
+
+export function SelectContent({ children }: ContentProps) {
   const { open } = useSelect();
 
   if (!open) return null;
 
   return (
-    <div className="absolute z-50 mt-1 w-full rounded-md border bg-white shadow-lg">
+    <div
+      className="
+        absolute left-0 top-full z-[9999]
+        mt-1 w-full overflow-hidden
+        rounded-md border bg-white shadow-lg
+      "
+    >
       {children}
     </div>
   );
 }
 
 // ---------- Item ----------
-export function SelectItem({
-  value,
-  children,
-}: {
+type ItemProps = {
   value: string;
   children: React.ReactNode;
-}) {
+};
+
+export function SelectItem({ value, children }: ItemProps) {
   const { setValue, setOpen, disabled } = useSelect();
 
   return (
     <div
       onClick={() => {
         if (disabled) return;
+
         setValue(value);
         setOpen(false);
       }}
-      className={`px-3 py-2 text-sm transition
+      className={`
+        px-3 py-2 text-sm transition
         ${
           disabled
             ? "cursor-not-allowed opacity-50"
             : "cursor-pointer hover:bg-gray-100"
-        }`}
+        }
+      `}
     >
       {children}
     </div>
