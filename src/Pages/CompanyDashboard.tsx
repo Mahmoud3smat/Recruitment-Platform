@@ -1,5 +1,6 @@
 // React Libraries
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { toast } from "sonner";
 import {
   Building2,
@@ -45,7 +46,7 @@ import { Checkbox } from "@/Components/checkbox";
 import { motion } from "framer-motion";
 
 // Data
-import { JobPosting, mockCandidates } from "@/Data/MockData";
+import { JobPosting, Candidate } from "@/Data/MockData";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
@@ -130,6 +131,31 @@ export const CompanyDashboard = () => {
   const [candidateLocationFilter, setCandidateLocationFilter] = useState("all");
   const [customField, setCustomField] = useState("");
   const { jobCategories } = useJobs();
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        setLoadingCandidates(true);
+
+        const response = await axios.get<{
+          success: boolean;
+          count: number;
+          data: Candidate[];
+        }>("http://localhost:5000/api/candidates");
+
+        setCandidates(response.data.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load candidates");
+      } finally {
+        setLoadingCandidates(false);
+      }
+    };
+
+    fetchCandidates();
+  }, []);
 
   const handleCreatePost = () => {
     if (!newPosting.title || !newPosting.category || !newPosting.location) {
@@ -191,7 +217,7 @@ export const CompanyDashboard = () => {
     }
   };
 
-  const filteredCandidates = mockCandidates.filter((c) => {
+  const filteredCandidates = candidates.filter((c) => {
     const matchSearch =
       c.name.toLowerCase().includes(candidateSearch.toLowerCase()) ||
       c.skills.some((s) =>
@@ -203,7 +229,7 @@ export const CompanyDashboard = () => {
     return matchSearch && matchLocation;
   });
 
-  const uniqueLocations = [...new Set(mockCandidates.map((c) => c.location))];
+  const uniqueLocations = [...new Set(candidates.map((c) => c.location))];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -258,7 +284,7 @@ export const CompanyDashboard = () => {
                 },
                 {
                   label: "Total Candidates",
-                  value: String(mockCandidates.length),
+                  value: String(candidates.length),
                   icon: Users,
                   color: "text-accent",
                 },
@@ -322,9 +348,9 @@ export const CompanyDashboard = () => {
                   Top Candidates
                 </h3>
                 <div className="space-y-3">
-                  {mockCandidates.slice(0, 3).map((c) => (
+                  {candidates.slice(0, 3).map((c) => (
                     <div
-                      key={c.id}
+                      key={c._id}
                       className="flex items-center justify-between rounded-lg border border-border p-3"
                     >
                       <div>
@@ -766,14 +792,18 @@ export const CompanyDashboard = () => {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              {filteredCandidates.length === 0 ? (
+              {loadingCandidates ? (
+                <p className="col-span-full text-center text-muted-foreground py-10">
+                  Loading candidates...
+                </p>
+              ) : filteredCandidates.length === 0 ? (
                 <p className="col-span-full text-center text-muted-foreground py-10">
                   No candidates match your filters.
                 </p>
               ) : (
                 filteredCandidates.map((c, i) => (
                   <motion.div
-                    key={c.id}
+                    key={c._id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
