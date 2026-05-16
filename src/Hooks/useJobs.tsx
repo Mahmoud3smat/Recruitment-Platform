@@ -14,13 +14,19 @@ export const useJobs = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/jobs");
-
-        setJobs(response.data.data);
-        const categories: string[] = [
-          ...new Set(jobs.map((job: Job) => job.category)),
+        const response = await axios.get<{
+          success: boolean;
+          data: Job[];
+        }>("http://localhost:5000/api/jobs");
+  
+        const fetchedJobs = response.data.data;
+  
+        setJobs(fetchedJobs);
+  
+        const categories = [
+          ...new Set(fetchedJobs.map((job) => job.category)),
         ];
-
+  
         setJobCategories(categories);
       } catch (err) {
         setError("Failed to fetch jobs");
@@ -29,7 +35,7 @@ export const useJobs = () => {
         setLoading(false);
       }
     };
-
+  
     fetchJobs();
   }, []);
 

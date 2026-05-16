@@ -1,5 +1,7 @@
 export interface JobPosting {
   id: string;
+  active: boolean;
+  company: string;
   title: string;
   description: string;
   category: string;
@@ -7,10 +9,11 @@ export interface JobPosting {
   type: string;
   salaryMin: string;
   salaryMax: string;
+  experience: string;
+  skills: string;
   workHours: string;
   benefits: string[];
   expiryDate: string;
-  active: boolean;
   createdAt: string;
 }
 

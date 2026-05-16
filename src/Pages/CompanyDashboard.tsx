@@ -1,3 +1,6 @@
+// ======================================
+//                Imports
+// ======================================
 // React Libraries
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -51,6 +54,9 @@ import { JobPosting, Candidate } from "@/Data/MockData";
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 
+// ======================================
+//          Global Variables
+// ======================================
 const benefitOptions = [
   "Housing Allowance",
   "Transport Allowance",
@@ -62,77 +68,58 @@ const benefitOptions = [
   "Training Budget",
 ];
 
+const companyData = {
+  name: "TechVision Inc.",
+  email: "hr@techvision.com",
+  industry: "Technology",
+  location: "Cairo, Egypt",
+  phone: "+20 100 123 4567",
+  website: "techvision.com",
+  description:
+    "A leading technology company building innovative solutions for the MENA region.",
+};
+
+const newPostData = {
+  company: "",
+  title: "",
+  description: "",
+  category: "",
+  location: "",
+  type: "Full-time",
+  salaryMin: "",
+  salaryMax: "",
+  experience: "",
+  skills: "",
+  workHours: "9 AM - 5 PM",
+  benefits: [],
+  expiryDate: "",
+  active: true,
+};
+
+// ======================================
+//           Main Function
+// ======================================
 export const CompanyDashboard = () => {
+  //! --------------- States ---------------
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
-  const [company, setCompany] = useState({
-    name: "TechVision Inc.",
-    email: "hr@techvision.com",
-    industry: "Technology",
-    location: "Cairo, Egypt",
-    phone: "+20 100 123 4567",
-    website: "techvision.com",
-    description:
-      "A leading technology company building innovative solutions for the MENA region.",
-  });
-
-  const [postings, setPostings] = useState<JobPosting[]>([
-    {
-      id: "p1",
-      title: "Senior Frontend Engineer",
-      description:
-        "Lead our web platform team with React, TypeScript, and modern CSS.",
-      category: "Frontend",
-      location: "Cairo, Egypt",
-      type: "Full-time",
-      salaryMin: "3000",
-      salaryMax: "5000",
-      workHours: "9 AM - 5 PM",
-      benefits: ["Medical Insurance", "Housing Allowance", "Remote Friendly"],
-      expiryDate: "2026-04-15",
-      active: true,
-      createdAt: "2 days ago",
-    },
-    {
-      id: "p2",
-      title: "Backend Developer",
-      description: "Build scalable APIs and microservices using Node.js.",
-      category: "Backend",
-      location: "Cairo, Egypt",
-      type: "Full-time",
-      salaryMin: "2500",
-      salaryMax: "4000",
-      workHours: "9 AM - 5 PM",
-      benefits: ["Social Insurance", "Transport Allowance"],
-      expiryDate: "2026-03-20",
-      active: true,
-      createdAt: "5 days ago",
-    },
-  ]);
-
-  const [newPosting, setNewPosting] = useState<
-    Omit<JobPosting, "id" | "createdAt">
-  >({
-    title: "",
-    description: "",
-    category: "",
-    location: "",
-    type: "Full-time",
-    salaryMin: "",
-    salaryMax: "",
-    workHours: "9 AM - 5 PM",
-    benefits: [],
-    expiryDate: "",
-    active: true,
-  });
-
+  const [postings, setPostings] = useState<JobPosting[]>([]);
   const [showNewPostDialog, setShowNewPostDialog] = useState(false);
   const [candidateSearch, setCandidateSearch] = useState("");
   const [candidateLocationFilter, setCandidateLocationFilter] = useState("all");
   const [customField, setCustomField] = useState("");
-  const { jobCategories } = useJobs();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loadingCandidates, setLoadingCandidates] = useState(false);
+  const [skillsInput, setSkillsInput] = useState("");
+  const { jobs, loading, jobCategories } = useJobs();
+  const [company, setCompany] = useState(companyData);
+  const [newPosting, setNewPosting] =
+    useState<Omit<JobPosting, "id" | "createdAt">>(newPostData);
+
+  //! --------------- Effects ---------------
+  useEffect(() => {
+    setPostings(jobs);
+  }, [jobs]);
 
   useEffect(() => {
     const fetchCandidates = async () => {
@@ -157,34 +144,61 @@ export const CompanyDashboard = () => {
     fetchCandidates();
   }, []);
 
-  const handleCreatePost = () => {
+  //! ------ Make new Post Functions ------
+  const handleCreatePost = async () => {
     if (!newPosting.title || !newPosting.category || !newPosting.location) {
-      toast.error("Please fill in all required fields");
+      toast.error("Please fill required fields");
       return;
     }
-    const post: JobPosting = {
-      ...newPosting,
-      id: `p${Date.now()}`,
-      createdAt: "Just now",
-    };
-    setPostings([post, ...postings]);
-    setNewPosting({
-      title: "",
-      description: "",
-      category: "",
-      location: "",
-      type: "Full-time",
-      salaryMin: "",
-      salaryMax: "",
-      workHours: "9 AM - 5 PM",
-      benefits: [],
-      expiryDate: "",
+
+    if (newPosting.description.length < 20) {
+      toast.error("Description must be at least 20 characters");
+      return;
+    }
+
+    if (!skillsInput.trim()) {
+      toast.error("Skills are required");
+      return;
+    }
+
+    const payload = {
+      company: company.name,
+      title: newPosting.title,
+      description: newPosting.description,
+      category: newPosting.category,
+      location: newPosting.location,
+      type: newPosting.type,
+      salary: `${newPosting.salaryMin} - ${newPosting.salaryMax}`,
+      postedAt: new Date(),
+      experience: newPosting.experience,
+      skills: skillsInput
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+      benefits: newPosting.benefits,
+      workHours: newPosting.workHours,
+      expiryDate: newPosting.expiryDate,
       active: true,
-    });
-    setShowNewPostDialog(false);
-    toast.success("Job posted successfully! 🎉");
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/jobs",
+        payload,
+      );
+
+      setPostings([response.data.data, ...postings]);
+
+      setShowNewPostDialog(false);
+
+      toast.success("Job posted successfully! 🎉");
+    } catch (error) {
+      console.log("FULL ERROR:", error.response?.data);
+      console.log("VALIDATION ERRORS:", error.response?.data?.errors);
+    }
   };
 
+  //! ------ Cancel any Post Functions ------
   const cancelPosting = (id: string) => {
     setPostings(
       postings.map((p) => (p.id === id ? { ...p, active: false } : p)),
@@ -192,6 +206,7 @@ export const CompanyDashboard = () => {
     toast.info("Job posting cancelled");
   };
 
+  //! ------ Delete any Post Functions ------
   const deletePosting = (id: string) => {
     setPostings(postings.filter((p) => p.id !== id));
     toast.success("Posting deleted");
@@ -231,6 +246,7 @@ export const CompanyDashboard = () => {
 
   const uniqueLocations = [...new Set(candidates.map((c) => c.location))];
 
+  //! ------ Return From Main Function ------
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div
@@ -509,7 +525,7 @@ export const CompanyDashboard = () => {
                       />
                     </div>
                     <div>
-                      <Label>Description</Label>
+                      <Label>Description *</Label>
                       <Textarea
                         value={newPosting.description}
                         onChange={(e) =>
@@ -518,9 +534,12 @@ export const CompanyDashboard = () => {
                             description: e.target.value,
                           })
                         }
-                        placeholder="Describe the role..."
-                        rows={3}
+                        placeholder="Write at least 20 characters..."
+                        rows={4}
                       />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Minimum 20 characters required
+                      </p>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
@@ -631,6 +650,30 @@ export const CompanyDashboard = () => {
                       </div>
                     </div>
                     <div>
+                      <Label>Skills *</Label>
+                      <Input
+                        value={skillsInput}
+                        onChange={(e) => setSkillsInput(e.target.value)}
+                        placeholder="React, TypeScript, Node.js"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Separate skills with commas
+                      </p>
+                    </div>
+                    <div>
+                      <Label>Experience *</Label>
+                      <Input
+                        value={newPosting.experience || ""}
+                        onChange={(e) =>
+                          setNewPosting({
+                            ...newPosting,
+                            experience: e.target.value,
+                          })
+                        }
+                        placeholder="e.g. 1-3 years"
+                      />
+                    </div>
+                    <div>
                       <Label>Expiry Date</Label>
                       <Input
                         type="date"
@@ -675,7 +718,11 @@ export const CompanyDashboard = () => {
             </div>
 
             <div className="space-y-4">
-              {postings.length === 0 ? (
+              {loading ? (
+                <p className="text-center text-muted-foreground py-10">
+                  Loading jobs...
+                </p>
+              ) : postings.length === 0 ? (
                 <p className="text-center text-muted-foreground py-10">
                   No job postings yet. Create your first one!
                 </p>
