@@ -1,5 +1,8 @@
 const Joi = require("joi");
 
+/**
+ * CREATE JOB
+ */
 const createJobSchema = Joi.object({
   title: Joi.string().trim().min(2).max(100).required().messages({
     "string.empty": "Job title is required",
@@ -77,8 +80,13 @@ const createJobSchema = Joi.object({
   isSaved: Joi.boolean().default(false),
 });
 
+/**
+ * UPDATE / PATCH JOB
+ */
 const updateJobSchema = Joi.object({
   title: Joi.string().trim().min(2).max(100),
+
+  active: Joi.boolean(),
 
   company: Joi.string().trim().min(2).max(100),
 
@@ -110,7 +118,7 @@ const updateJobSchema = Joi.object({
 
   experience: Joi.string().trim(),
 
-  skills: Joi.array().items(Joi.string().trim()).min(1),
+  skills: Joi.array().items(Joi.string().trim()),
 
   description: Joi.string().trim().min(20),
 
@@ -119,6 +127,7 @@ const updateJobSchema = Joi.object({
   isSaved: Joi.boolean(),
 })
   .min(1)
+  .unknown(false)
   .messages({
     "object.min": "At least one field is required to update the job",
   });

@@ -39,5 +39,5 @@ export const useJobs = () => {
     fetchJobs();
   }, []);
 
-  return { jobs, loading, error, jobCategories };
+  return { jobs, loading, error, jobCategories, setJobCategories };
 };
