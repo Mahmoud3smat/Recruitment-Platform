@@ -114,7 +114,7 @@ export const CompanyDashboard = () => {
   const { jobs, loading, jobCategories } = useJobs();
   const [company, setCompany] = useState(companyData);
   const [newPosting, setNewPosting] =
-    useState<Omit<JobPosting, "id" | "createdAt">>(newPostData);
+    useState<Omit<JobPosting, "_id" | "createdAt">>(newPostData);
 
   //! --------------- Effects ---------------
   useEffect(() => {
@@ -201,15 +201,23 @@ export const CompanyDashboard = () => {
   //! ------ Cancel any Post Functions ------
   const cancelPosting = (id: string) => {
     setPostings(
-      postings.map((p) => (p.id === id ? { ...p, active: false } : p)),
+      postings.map((p) => (p._id === id ? { ...p, active: false } : p)),
     );
     toast.info("Job posting cancelled");
   };
 
   //! ------ Delete any Post Functions ------
-  const deletePosting = (id: string) => {
-    setPostings(postings.filter((p) => p.id !== id));
-    toast.success("Posting deleted");
+  const deletePosting = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/jobs/${id}`);
+
+      setPostings((prev) => prev.filter((p) => p._id !== id));
+
+      toast.success("Posting deleted");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete posting");
+    }
   };
 
   const toggleBenefit = (benefit: string) => {
@@ -342,7 +350,7 @@ export const CompanyDashboard = () => {
                 <div className="space-y-3">
                   {postings.slice(0, 3).map((p) => (
                     <div
-                      key={p.id}
+                      key={p._id}
                       className="flex items-center justify-between rounded-lg border border-border p-3"
                     >
                       <div>
@@ -729,7 +737,7 @@ export const CompanyDashboard = () => {
               ) : (
                 postings.map((p, i) => (
                   <motion.div
-                    key={p.id}
+                    key={p._id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
@@ -784,7 +792,7 @@ export const CompanyDashboard = () => {
                             variant="outline"
                             size="sm"
                             className="gap-1"
-                            onClick={() => cancelPosting(p.id)}
+                            onClick={() => cancelPosting(p._id)}
                           >
                             <X className="h-3.5 w-3.5" /> Cancel
                           </Button>
@@ -793,7 +801,7 @@ export const CompanyDashboard = () => {
                           variant="outline"
                           size="sm"
                           className="gap-1 text-destructive hover:text-destructive"
-                          onClick={() => deletePosting(p.id)}
+                          onClick={() => deletePosting(p._id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Delete
                         </Button>

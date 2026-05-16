@@ -1,5 +1,5 @@
 export interface JobPosting {
-  id: string;
+  _id: string;
   active: boolean;
   company: string;
   title: string;
