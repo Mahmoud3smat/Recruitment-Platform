@@ -4,7 +4,6 @@
 // React Libraries
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "sonner";
 import {
   Building2,
   Briefcase,
@@ -23,6 +22,9 @@ import {
   X,
 } from "lucide-react";
 
+// Animations
+import { motion } from "framer-motion";
+
 // Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 import { Button } from "@/Components/button";
@@ -30,6 +32,8 @@ import { Input } from "@/Components/input";
 import { Label } from "@/Components/label";
 import { Badge } from "@/Components/badge";
 import { Textarea } from "@/Components/textarea";
+import { showToast } from "@/Components/toast";
+import { Checkbox } from "@/Components/checkbox";
 import {
   Select,
   SelectContent,
@@ -45,8 +49,6 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/Components/dialog";
-import { Checkbox } from "@/Components/checkbox";
-import { motion } from "framer-motion";
 
 // Data
 import { JobPosting, Candidate } from "@/Data/MockData";
@@ -135,7 +137,7 @@ export const CompanyDashboard = () => {
         setCandidates(response.data.data);
       } catch (error) {
         console.error(error);
-        toast.error("Failed to load candidates");
+        showToast("error", "Failed to load candidates");
       } finally {
         setLoadingCandidates(false);
       }
@@ -147,17 +149,17 @@ export const CompanyDashboard = () => {
   //! ------ Make new Post Functions ------
   const handleCreatePost = async () => {
     if (!newPosting.title || !newPosting.category || !newPosting.location) {
-      toast.error("Please fill required fields");
+      showToast("error", "Please fill required fields");
       return;
     }
 
     if (newPosting.description.length < 20) {
-      toast.error("Description must be at least 20 characters");
+      showToast("error", "Description must be at least 20 characters");
       return;
     }
 
     if (!skillsInput.trim()) {
-      toast.error("Skills are required");
+      showToast("error", "Skills are required");
       return;
     }
 
@@ -191,7 +193,7 @@ export const CompanyDashboard = () => {
 
       setShowNewPostDialog(false);
 
-      toast.success("Job posted successfully! 🎉");
+      showToast("success", "Job posted successfully! 🎉");
     } catch (error) {
       console.log("FULL ERROR:", error.response?.data);
       console.log("VALIDATION ERRORS:", error.response?.data?.errors);
@@ -203,7 +205,7 @@ export const CompanyDashboard = () => {
     setPostings(
       postings.map((p) => (p._id === id ? { ...p, active: false } : p)),
     );
-    toast.info("Job posting cancelled");
+    showToast("info", "Job posting cancelled");
   };
 
   //! ------ Delete any Post Functions ------
@@ -213,10 +215,10 @@ export const CompanyDashboard = () => {
 
       setPostings((prev) => prev.filter((p) => p._id !== id));
 
-      toast.success("Posting deleted");
+      showToast("success", "Posting deleted");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete posting");
+      showToast("error", "Failed to delete posting");
     }
   };
 
@@ -234,9 +236,9 @@ export const CompanyDashboard = () => {
       jobCategories.push(customField.trim());
       setNewPosting({ ...newPosting, category: customField.trim() });
       setCustomField("");
-      toast.success("New field added!");
+      showToast("success", "New field added!");
     } else if (jobCategories.includes(customField.trim())) {
-      toast.error("This field already exists");
+      showToast("error", "This field already exists");
     }
   };
 
@@ -403,7 +405,8 @@ export const CompanyDashboard = () => {
                   size="sm"
                   className="gap-2"
                   onClick={() => {
-                    if (isEditing) toast.success("Company profile saved!");
+                    if (isEditing)
+                      showToast("success", "Company profile saved!");
                     setIsEditing(!isEditing);
                   }}
                 >

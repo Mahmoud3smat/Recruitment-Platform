@@ -1,4 +1,6 @@
+// React Libraries
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 
 // -------------- Contexts --------------
 import { AuthProvider } from "./Contexts/AuthContext";
@@ -55,6 +57,7 @@ const AppRoutes = () => (
 const App = () => (
   <BrowserRouter>
     <AuthProvider>
+      <Toaster richColors position="top-right" />
       <AppRoutes />
     </AuthProvider>
   </BrowserRouter>
