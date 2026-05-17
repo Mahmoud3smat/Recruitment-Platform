@@ -91,9 +91,9 @@ const login = async (req, res) => {
   try {
     const { role, email, password } = req.body;
 
-    const user = await User.findOne({ email, role }).select("+password");
+    const user = await User.findOne({ email }).select("+password");
 
-    if (!user) {
+    if (!user || user.role !== role) {
       return res.status(401).json({
         success: false,
         message: "Invalid email, password, or account type",

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, User, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 
 // Animations
 import { motion } from "framer-motion";
@@ -17,10 +18,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 import { useAuth } from "@/Contexts/AuthContext";
 
 export const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [seekerLogin, setSeekerLogin] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [companyLogin, setCompanyLogin] = useState({
+    email: "",
+    password: "",
+  });
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-10">
@@ -53,31 +61,64 @@ export const Login = () => {
             <TabsContent value="seeker">
               <form
                 className="space-y-4"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  login("seeker");
-                  toast.success("Welcome back!");
-                  navigate("/seeker-dashboard");
+
+                  try {
+                    const res = await axios.post(
+                      "http://localhost:5000/api/auth/login",
+                      {
+                        email: seekerLogin.email,
+                        password: seekerLogin.password,
+                        role: "job_seeker",
+                      },
+                    );
+
+                    login(res.data.user, res.data.token);
+                    toast.success("Welcome back!");
+
+                    navigate("/seeker-dashboard");
+                  } catch (err: unknown) {
+                    if (axios.isAxiosError(err)) {
+                      const message =
+                        err.response?.data?.message ||
+                        err.response?.data?.errors?.[0]?.message ||
+                        "Login failed";
+
+                      toast.error(message);
+
+                      console.log("STATUS:", err.response?.status);
+                      console.log("DATA:", err.response?.data);
+                    } else {
+                      toast.error("Something went wrong");
+                      console.log(err);
+                    }
+                  }
                 }}
               >
                 <div>
                   <Label htmlFor="seeker-email">Email</Label>
+
                   <Input
-                    id="seeker-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={seekerLogin.email}
+                    onChange={(e) =>
+                      setSeekerLogin({
+                        ...seekerLogin,
+                        email: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
                   <Label htmlFor="seeker-pass">Password</Label>
                   <Input
-                    id="seeker-pass"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={seekerLogin.password}
+                    onChange={(e) =>
+                      setSeekerLogin({
+                        ...seekerLogin,
+                        password: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <Button className="w-full" type="submit">
@@ -89,31 +130,63 @@ export const Login = () => {
             <TabsContent value="company">
               <form
                 className="space-y-4"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  login("company");
-                  toast.success("Welcome back!");
-                  navigate("/company-dashboard");
+
+                  try {
+                    const res = await axios.post(
+                      "http://localhost:5000/api/auth/login",
+                      {
+                        email: companyLogin.email,
+                        password: companyLogin.password,
+                        role: "company",
+                      },
+                    );
+
+                    login(res.data.user, res.data.token);
+                    toast.success("Welcome back!");
+
+                    navigate("/company-dashboard");
+                  } catch (err: unknown) {
+                    if (axios.isAxiosError(err)) {
+                      const message =
+                        err.response?.data?.message ||
+                        err.response?.data?.errors?.[0]?.message ||
+                        "Login failed";
+
+                      toast.error(message);
+
+                      console.log("STATUS:", err.response?.status);
+                      console.log("DATA:", err.response?.data);
+                    } else {
+                      toast.error("Something went wrong");
+                      console.log(err);
+                    }
+                  }
                 }}
               >
                 <div>
                   <Label htmlFor="company-email">Company Email</Label>
                   <Input
-                    id="company-email"
-                    type="email"
-                    placeholder="hr@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={companyLogin.email}
+                    onChange={(e) =>
+                      setCompanyLogin({
+                        ...companyLogin,
+                        email: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
                   <Label htmlFor="company-pass">Password</Label>
                   <Input
-                    id="company-pass"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={companyLogin.password}
+                    onChange={(e) =>
+                      setCompanyLogin({
+                        ...companyLogin,
+                        password: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <Button className="w-full" type="submit">
