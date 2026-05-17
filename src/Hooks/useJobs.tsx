@@ -17,7 +17,7 @@ export const useJobs = () => {
         const response = await axios.get<{
           success: boolean;
           data: Job[];
-        }>("http://localhost:5000/api/jobs");
+        }>("https://recruitment-platform-backend-azure.vercel.app/api/jobs");
   
         const fetchedJobs = response.data.data;
   

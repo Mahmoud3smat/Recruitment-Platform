@@ -79,7 +79,7 @@ export const SeekerDashboard = () => {
       try {
         setLoadingCourses(true);
 
-        const API_URL = "http://localhost:5000/api/courses";
+        const API_URL = "https://recruitment-platform-backend-azure.vercel.app/api/courses";
         const response = await axios.get<{
           success: boolean;
           count: number;
@@ -107,7 +107,7 @@ export const SeekerDashboard = () => {
           success: boolean;
           count: number;
           data: SkillTest[];
-        }>("http://localhost:5000/api/skill-tests");
+        }>("https://recruitment-platform-backend-azure.vercel.app/api/skill-tests");
 
         setSkillTests(response.data.data);
       } catch (error) {

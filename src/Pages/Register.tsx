@@ -11,7 +11,6 @@ import { motion } from "framer-motion";
 // Components
 import { Button } from "@/Components/button";
 import { Input } from "@/Components/input";
-import { Label } from "@/Components/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 import {
   Select,
@@ -103,7 +102,7 @@ export const Register = () => {
 
                   try {
                     const res = await axios.post(
-                      "http://localhost:5000/api/auth/register",
+                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/register",
                       {
                         fullName: seekerData.name,
                         email: seekerData.email,
@@ -226,7 +225,7 @@ export const Register = () => {
 
                   try {
                     const res = await axios.post(
-                      "http://localhost:5000/api/auth/register",
+                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/register",
                       {
                         companyName: companyData.name,
                         email: companyData.email,

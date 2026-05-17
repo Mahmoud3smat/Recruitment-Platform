@@ -66,7 +66,7 @@ export const Login = () => {
 
                   try {
                     const res = await axios.post(
-                      "http://localhost:5000/api/auth/login",
+                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/login",
                       {
                         email: seekerLogin.email,
                         password: seekerLogin.password,
@@ -135,7 +135,7 @@ export const Login = () => {
 
                   try {
                     const res = await axios.post(
-                      "http://localhost:5000/api/auth/login",
+                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/login",
                       {
                         email: companyLogin.email,
                         password: companyLogin.password,

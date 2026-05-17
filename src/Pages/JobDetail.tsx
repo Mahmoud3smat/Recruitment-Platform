@@ -35,7 +35,7 @@ export const JobDetail = () => {
     const fetchJob = async () => {
       try {
         const response = await axios.get<JobResponse>(
-          `http://localhost:5000/api/jobs/${id}`,
+          `https://recruitment-platform-backend-azure.vercel.app/api/jobs/${id}`,
         );
 
         setJob(response.data.data);

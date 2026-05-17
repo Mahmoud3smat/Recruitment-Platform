@@ -34,7 +34,7 @@ export function Team() {
     const fetchMembers = async () => {
       try {
         const response = await axios.get<TeamMembersResponse>(
-          "http://localhost:5000/api/team-members",
+          "https://recruitment-platform-backend-azure.vercel.app/api/team-members",
         );
 
         setMembers(response.data);

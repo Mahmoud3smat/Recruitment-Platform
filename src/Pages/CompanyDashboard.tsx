@@ -132,7 +132,7 @@ export const CompanyDashboard = () => {
           success: boolean;
           count: number;
           data: Candidate[];
-        }>("http://localhost:5000/api/candidates");
+        }>("https://recruitment-platform-backend-azure.vercel.app/api/candidates");
 
         setCandidates(response.data.data);
       } catch (error) {
@@ -185,7 +185,7 @@ export const CompanyDashboard = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/jobs",
+        "https://recruitment-platform-backend-azure.vercel.app/api/jobs",
         payload,
       );
 
@@ -209,7 +209,7 @@ export const CompanyDashboard = () => {
     );
 
     try {
-      await axios.patch(`http://localhost:5000/api/jobs/${id}`, {
+      await axios.patch(`https://recruitment-platform-backend-azure.vercel.app/api/jobs/${id}`, {
         active: false,
       });
 
@@ -223,7 +223,7 @@ export const CompanyDashboard = () => {
   //! ------ Delete any Post Functions ------
   const deletePosting = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/jobs/${id}`);
+      await axios.delete(`https://recruitment-platform-backend-azure.vercel.app/api/jobs/${id}`);
 
       setPostings((prev) => prev.filter((p) => p._id !== id));
 
