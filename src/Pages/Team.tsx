@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 
 // Components
 import { Badge } from "@/Components/badge";
+import { TeamSkeleton } from "@/Components/Skeleton";
 
 interface TeamMember {
   name: string;
@@ -49,7 +50,7 @@ export function Team() {
     fetchMembers();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <TeamSkeleton />;
 
   if (error) return <p>{error}</p>;
 
@@ -60,20 +61,20 @@ export function Team() {
           Meet Our Team
         </h1>
         <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-          A talented group of {members.data.length} passionate individuals
+          A talented group of {members?.data.length} passionate individuals
           building the future of job recruitment.
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {members.data.map((member, i) => (
+      <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {members?.data.map((member, i) => (
           <motion.div
             key={member.name}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.08, duration: 0.5 }}
-            className={`relative rounded-xl border bg-card p-6 card-elevated ${
+            className={`relative flex h-full min-h-[280px] flex-col rounded-xl border bg-card p-6 card-elevated ${
               member.isLeader
                 ? "border-primary/40 ring-1 ring-primary/20"
                 : "border-border"
@@ -94,8 +95,10 @@ export function Team() {
               {member.name}
             </h3>
             <p className="text-sm text-primary font-medium">{member.role}</p>
-            <p className="mt-2 text-sm text-muted-foreground">{member.bio}</p>
-            <div className="mt-4 flex gap-3">
+            <p className="mt-2 line-clamp-4 text-sm text-muted-foreground">
+              {member.bio}
+            </p>
+            <div className="mt-auto flex gap-3 pt-4">
               <a
                 href={member.linkedin}
                 target="_blank"

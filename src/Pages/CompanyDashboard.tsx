@@ -55,6 +55,8 @@ import { JobPosting, Candidate } from "@/Data/MockData";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
+import { useAuth } from "@/Contexts/AuthContext";
+import { getUserDisplayName } from "@/Utils/authDisplay";
 
 // ======================================
 //          Global Variables
@@ -102,6 +104,8 @@ const newPostData = {
 //           Main Function
 // ======================================
 export const CompanyDashboard = () => {
+  const { user } = useAuth();
+  const companyDisplayName = getUserDisplayName(user) || companyData.name;
   //! --------------- States ---------------
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
@@ -114,11 +118,27 @@ export const CompanyDashboard = () => {
   const [loadingCandidates, setLoadingCandidates] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
   const { jobs, loading, jobCategories, setJobCategories } = useJobs();
-  const [company, setCompany] = useState(companyData);
+  const [company, setCompany] = useState({
+    ...companyData,
+    name: companyDisplayName,
+    email: user?.email || companyData.email,
+    industry: user?.industry || companyData.industry,
+    location: user?.location || companyData.location,
+  });
   const [newPosting, setNewPosting] =
     useState<Omit<JobPosting, "_id" | "createdAt">>(newPostData);
 
   //! --------------- Effects ---------------
+  useEffect(() => {
+    setCompany((currentCompany) => ({
+      ...currentCompany,
+      name: companyDisplayName,
+      email: user?.email || currentCompany.email,
+      industry: user?.industry || currentCompany.industry,
+      location: user?.location || currentCompany.location,
+    }));
+  }, [companyDisplayName, user?.email, user?.industry, user?.location]);
+
   useEffect(() => {
     setPostings(jobs);
   }, [jobs]);
@@ -278,7 +298,7 @@ export const CompanyDashboard = () => {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-display text-3xl font-bold text-foreground">
-              {company.name}
+              Welcome back, {company.name}!
             </h1>
             <p className="text-muted-foreground">
               Manage your company and job postings
@@ -861,7 +881,7 @@ export const CompanyDashboard = () => {
               </Select>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid items-stretch gap-4 md:grid-cols-2">
               {loadingCandidates ? (
                 <p className="col-span-full text-center text-muted-foreground py-10">
                   Loading candidates...
@@ -877,7 +897,7 @@ export const CompanyDashboard = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="rounded-xl border border-border bg-card p-5 card-elevated"
+                    className="flex h-full min-h-[210px] flex-col rounded-xl border border-border bg-card p-5 card-elevated"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">

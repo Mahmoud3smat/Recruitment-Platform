@@ -1,23 +1,29 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Briefcase, LogOut } from "lucide-react";
+import { Menu, X, Briefcase, LogOut, User } from "lucide-react";
 import { Button } from "@/Components/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/Contexts/AuthContext";
 import { toast } from "sonner";
+import {
+  getUserDashboardPath,
+  getUserDisplayName,
+} from "@/Utils/authDisplay";
 
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { userRole, isLoggedIn, logout } = useAuth();
+  const { user, isLoggedIn, logout } = useAuth();
+  const userName = getUserDisplayName(user);
+  const dashboardPath = getUserDashboardPath(user);
 
   const navLinks = [
     { to: "/", label: "Home", show: true },
     {
       to: "/jobs",
       label: "Find Jobs",
-      show: !isLoggedIn || userRole === "seeker",
+      show: !isLoggedIn || user?.role === "job_seeker",
     },
     { to: "/about", label: "About", show: true },
     { to: "/team", label: "Team", show: true },
@@ -65,20 +71,13 @@ export const Navbar = () => {
         <div className="hidden items-center gap-3 md:flex">
           {isLoggedIn ? (
             <>
-              {userRole === "seeker" && (
-                <Link to="/seeker-dashboard">
-                  <Button variant="ghost" size="sm">
-                    My Dashboard
-                  </Button>
-                </Link>
-              )}
-              {userRole === "company" && (
-                <Link to="/company-dashboard">
-                  <Button variant="ghost" size="sm">
-                    Company Dashboard
-                  </Button>
-                </Link>
-              )}
+              <Link
+                to={dashboardPath}
+                className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                <User className="h-4 w-4 text-primary" />
+                {userName || "My Account"}
+              </Link>
               <Button
                 variant="outline"
                 size="sm"
@@ -138,26 +137,12 @@ export const Navbar = () => {
               <div className="mt-3 flex flex-col gap-2">
                 {isLoggedIn ? (
                   <>
-                    {userRole === "seeker" && (
-                      <Link
-                        to="/seeker-dashboard"
-                        onClick={() => setOpen(false)}
-                      >
-                        <Button variant="outline" className="w-full">
-                          My Dashboard
-                        </Button>
-                      </Link>
-                    )}
-                    {userRole === "company" && (
-                      <Link
-                        to="/company-dashboard"
-                        onClick={() => setOpen(false)}
-                      >
-                        <Button variant="outline" className="w-full">
-                          Company Dashboard
-                        </Button>
-                      </Link>
-                    )}
+                    <Link to={dashboardPath} onClick={() => setOpen(false)}>
+                      <Button variant="outline" className="w-full gap-2">
+                        <User className="h-4 w-4" />
+                        {userName || "My Account"}
+                      </Button>
+                    </Link>
                     <Button
                       className="w-full gap-2"
                       variant="destructive"

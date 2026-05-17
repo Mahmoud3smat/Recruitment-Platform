@@ -4,7 +4,10 @@ export type User = {
   _id: string;
   email: string;
   role: "job_seeker" | "company";
+  name?: string;
   fullName?: string;
+  firstName?: string;
+  lastName?: string;
   companyName?: string;
   preferredField?: string;
   industry?: string;
@@ -29,9 +32,24 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+const getStoredUser = () => {
+  const storedUser = localStorage.getItem("user");
+
+  if (!storedUser) return null;
+
+  try {
+    return JSON.parse(storedUser) as User;
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(() => getStoredUser());
+  const [token, setToken] = useState<string | null>(() =>
+    localStorage.getItem("token"),
+  );
 
   const login = (userData: User, token: string) => {
     setUser(userData);

@@ -49,13 +49,18 @@ import { Course, SkillTest } from "@/Data/MockData";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
+import { useAuth } from "@/Contexts/AuthContext";
+import { getUserFirstName, getUserDisplayName } from "@/Utils/authDisplay";
 
 export const SeekerDashboard = () => {
+  const { user } = useAuth();
+  const seekerName = getUserDisplayName(user) || "Job Seeker";
+  const firstName = getUserFirstName(user, "Job Seeker");
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: "Mahmoud Esmat",
-    email: "mahmoudesmat20029@gmail.com",
+    name: seekerName,
+    email: user?.email || "",
     title: "Frontend Engineer",
     location: "Cairo, Egypt",
     experience: "3 years",
@@ -73,6 +78,16 @@ export const SeekerDashboard = () => {
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [skillTests, setSkillTests] = useState<SkillTest[]>([]);
   const [loadingTests, setLoadingTests] = useState(false);
+
+  useEffect(() => {
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      name: seekerName,
+      email: user?.email || currentProfile.email,
+      preferredField: user?.preferredField || currentProfile.preferredField,
+      location: user?.location || currentProfile.location,
+    }));
+  }, [seekerName, user?.email, user?.location, user?.preferredField]);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -154,7 +169,7 @@ export const SeekerDashboard = () => {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-display text-3xl font-bold text-foreground">
-              Welcome back, {profile.name.split(" ")[0]}!
+              Welcome back, {firstName}!
             </h1>
             <p className="text-muted-foreground">
               Manage your profile and discover opportunities
@@ -245,7 +260,7 @@ export const SeekerDashboard = () => {
                   Update your profile to get personalized recommendations.
                 </p>
               ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {recommendedJobs.map((job, i) => (
                     <JobCard key={job._id} job={job} index={i} />
                   ))}
@@ -439,7 +454,7 @@ export const SeekerDashboard = () => {
               Take skill assessments to validate your expertise and stand out to
               employers.
             </p>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
               {loadingTests ? (
                 <p className="text-muted-foreground">Loading tests...</p>
               ) : skillTests.length === 0 ? (
@@ -451,7 +466,7 @@ export const SeekerDashboard = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="rounded-xl border border-border bg-card p-5 card-elevated"
+                    className="flex h-full min-h-[260px] flex-col rounded-xl border border-border bg-card p-5 card-elevated"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <Badge variant="secondary">{test.category}</Badge>
@@ -462,10 +477,10 @@ export const SeekerDashboard = () => {
                     <h3 className="font-display text-lg font-semibold text-card-foreground">
                       {test.title}
                     </h3>
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm text-muted-foreground">
                       {test.description}
                     </p>
-                    <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="mt-auto flex items-center gap-4 pt-4 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <CheckCircle className="h-3.5 w-3.5" /> {test.questions}{" "}
                         questions
@@ -549,14 +564,14 @@ export const SeekerDashboard = () => {
             {loadingCourses ? (
               <p className="text-muted-foreground">Loading courses...</p>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {courses.map((course, i) => (
                   <motion.div
                     key={course._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="rounded-xl border border-border bg-card p-5 card-elevated"
+                    className="flex h-full min-h-[300px] flex-col rounded-xl border border-border bg-card p-5 card-elevated"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <Badge variant="secondary">{course.category}</Badge>
@@ -571,10 +586,10 @@ export const SeekerDashboard = () => {
                     <p className="mt-1 text-xs text-muted-foreground">
                       by {course.instructor}
                     </p>
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm text-muted-foreground">
                       {course.description}
                     </p>
-                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                    <div className="mt-auto flex flex-wrap items-center gap-3 pt-4 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5" /> {course.duration}
                       </span>

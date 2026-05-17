@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 
 // Contexts Hooks
 import { useAuth } from "@/Contexts/AuthContext";
+import { normalizeAuthUser } from "@/Utils/authDisplay";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -74,7 +75,13 @@ export const Login = () => {
                       },
                     );
 
-                    login(res.data.user, res.data.token);
+                    login(
+                      normalizeAuthUser(res.data, {
+                        email: seekerLogin.email,
+                        role: "job_seeker",
+                      }),
+                      res.data.token,
+                    );
                     toast.success("Welcome back!");
 
                     navigate("/seeker-dashboard");
@@ -100,6 +107,10 @@ export const Login = () => {
                   <Label htmlFor="seeker-email">Email</Label>
 
                   <Input
+                    id="seeker-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    autoComplete="email"
                     value={seekerLogin.email}
                     onChange={(e) =>
                       setSeekerLogin({
@@ -112,6 +123,10 @@ export const Login = () => {
                 <div>
                   <Label htmlFor="seeker-pass">Password</Label>
                   <Input
+                    id="seeker-pass"
+                    type="password"
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
                     value={seekerLogin.password}
                     onChange={(e) =>
                       setSeekerLogin({
@@ -143,7 +158,13 @@ export const Login = () => {
                       },
                     );
 
-                    login(res.data.user, res.data.token);
+                    login(
+                      normalizeAuthUser(res.data, {
+                        email: companyLogin.email,
+                        role: "company",
+                      }),
+                      res.data.token,
+                    );
                     toast.success("Welcome back!");
 
                     navigate("/company-dashboard");
@@ -168,6 +189,10 @@ export const Login = () => {
                 <div>
                   <Label htmlFor="company-email">Company Email</Label>
                   <Input
+                    id="company-email"
+                    type="email"
+                    placeholder="Enter company email"
+                    autoComplete="email"
                     value={companyLogin.email}
                     onChange={(e) =>
                       setCompanyLogin({
@@ -180,6 +205,10 @@ export const Login = () => {
                 <div>
                   <Label htmlFor="company-pass">Password</Label>
                   <Input
+                    id="company-pass"
+                    type="password"
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
                     value={companyLogin.password}
                     onChange={(e) =>
                       setCompanyLogin({

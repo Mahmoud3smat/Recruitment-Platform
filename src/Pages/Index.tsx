@@ -126,7 +126,7 @@ export const Index = () => {
               one platform.
             </p>
           </motion.div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
               <motion.div
                 key={f.title}
@@ -134,7 +134,7 @@ export const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="rounded-xl border border-border bg-card p-6 card-elevated"
+                className="flex h-full min-h-[210px] flex-col rounded-xl border border-border bg-card p-6 card-elevated"
               >
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <f.icon className="h-6 w-6 text-primary" />
@@ -170,7 +170,7 @@ export const Index = () => {
               </Button>
             </Link>
           </motion.div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
             {jobs.slice(0, 3).map((job, i) => (
               <JobCard key={job._id} job={job} index={i} />
             ))}

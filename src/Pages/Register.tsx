@@ -22,6 +22,7 @@ import {
 
 // Context Hooks
 import { useAuth } from "@/Contexts/AuthContext";
+import { normalizeAuthUser } from "@/Utils/authDisplay";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
@@ -112,7 +113,16 @@ export const Register = () => {
                       },
                     );
 
-                    localStorage.setItem("token", res.data.token);
+                    login(
+                      normalizeAuthUser(res.data, {
+                        fullName: seekerData.name,
+                        name: seekerData.name,
+                        email: seekerData.email,
+                        preferredField: seekerData.field,
+                        role: "job_seeker",
+                      }),
+                      res.data.token,
+                    );
 
                     toast.success("Account created successfully!");
 
@@ -238,7 +248,17 @@ export const Register = () => {
 
                     localStorage.setItem("token", res.data.token);
 
-                    login(res.data.user, res.data.token);
+                    login(
+                      normalizeAuthUser(res.data, {
+                        companyName: companyData.name,
+                        name: companyData.name,
+                        email: companyData.email,
+                        industry: companyData.industry,
+                        location: companyData.location,
+                        role: "company",
+                      }),
+                      res.data.token,
+                    );
 
                     toast.success("Company account created!");
 

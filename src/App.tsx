@@ -1,5 +1,6 @@
 // React Libraries
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 
 // Contexts
@@ -20,6 +21,7 @@ import { Register } from "@/Pages/Register";
 import { NotFound } from "@/Components/NotFound";
 import { SeekerDashboard } from "@/Pages/SeekerDashboard";
 import { CompanyDashboard } from "@/Pages/CompanyDashboard";
+import { AppSkeleton } from "@/Components/Skeleton";
 
 const AppRoutes = () => (
   <div className="flex min-h-screen flex-col">
@@ -54,13 +56,23 @@ const AppRoutes = () => (
   </div>
 );
 
-const App = () => (
-  <BrowserRouter>
-    <AuthProvider>
-      <Toaster richColors position="bottom-right" />
-      <AppRoutes />
-    </AuthProvider>
-  </BrowserRouter>
-);
+const App = () => {
+  const [bootLoading, setBootLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setBootLoading(false), 900);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Toaster richColors position="bottom-right" />
+        {bootLoading ? <AppSkeleton /> : <AppRoutes />}
+      </AuthProvider>
+    </BrowserRouter>
+  );
+};
 
 export default App;
