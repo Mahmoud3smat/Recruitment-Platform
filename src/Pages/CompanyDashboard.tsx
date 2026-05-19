@@ -547,7 +547,7 @@ export const CompanyDashboard = () => {
                     <Plus className="h-4 w-4" /> New Posting
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+                <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl">
                   <DialogHeader>
                     <DialogTitle className="font-display">
                       Create Job Posting
@@ -584,7 +584,7 @@ export const CompanyDashboard = () => {
                         Minimum 20 characters required
                       </p>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       <div>
                         <Label>Category *</Label>
                         <Select
@@ -747,7 +747,7 @@ export const CompanyDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <DialogFooter>
+                  <DialogFooter className="mt-10">
                     <Button
                       variant="outline"
                       onClick={() => setShowNewPostDialog(false)}

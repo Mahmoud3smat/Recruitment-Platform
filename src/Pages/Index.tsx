@@ -126,7 +126,7 @@ export const Index = () => {
               one platform.
             </p>
           </motion.div>
-          <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
               <motion.div
                 key={f.title}

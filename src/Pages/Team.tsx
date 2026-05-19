@@ -67,7 +67,7 @@ export function Team() {
       </div>
 
       <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {members?.data.map((member, i) => (
+        {members?.data.slice().reverse().map((member, i) => (
           <motion.div
             key={member.name}
             initial={{ opacity: 0, y: 20 }}
