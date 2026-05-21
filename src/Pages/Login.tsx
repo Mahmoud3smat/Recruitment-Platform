@@ -18,6 +18,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/tabs";
 import { useAuth } from "@/Contexts/AuthContext";
 import { normalizeAuthUser } from "@/Utils/authDisplay";
 
+// Data
+import { API_URL } from "@/Data/MockData";
+
 export const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -66,14 +69,11 @@ export const Login = () => {
                   e.preventDefault();
 
                   try {
-                    const res = await axios.post(
-                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/login",
-                      {
-                        email: seekerLogin.email,
-                        password: seekerLogin.password,
-                        role: "job_seeker",
-                      },
-                    );
+                    const res = await axios.post(`${API_URL}/auth/login`, {
+                      email: seekerLogin.email,
+                      password: seekerLogin.password,
+                      role: "job_seeker",
+                    });
 
                     login(
                       normalizeAuthUser(res.data, {
@@ -149,14 +149,11 @@ export const Login = () => {
                   e.preventDefault();
 
                   try {
-                    const res = await axios.post(
-                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/login",
-                      {
-                        email: companyLogin.email,
-                        password: companyLogin.password,
-                        role: "company",
-                      },
-                    );
+                    const res = await axios.post(`${API_URL}/auth/login`, {
+                      email: companyLogin.email,
+                      password: companyLogin.password,
+                      role: "company",
+                    });
 
                     login(
                       normalizeAuthUser(res.data, {

@@ -27,6 +27,9 @@ import { normalizeAuthUser } from "@/Utils/authDisplay";
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 
+// Data
+import { API_URL } from "@/Data/MockData";
+
 export const Register = () => {
   const [seekerData, setSeekerData] = useState({
     name: "",
@@ -102,16 +105,13 @@ export const Register = () => {
                   if (!seekerData.field) return toast.error("Select a field");
 
                   try {
-                    const res = await axios.post(
-                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/register",
-                      {
-                        fullName: seekerData.name,
-                        email: seekerData.email,
-                        password: seekerData.password,
-                        preferredField: seekerData.field,
-                        role: "job_seeker",
-                      },
-                    );
+                    const res = await axios.post(`${API_URL}/auth/register`, {
+                      fullName: seekerData.name,
+                      email: seekerData.email,
+                      password: seekerData.password,
+                      preferredField: seekerData.field,
+                      role: "job_seeker",
+                    });
 
                     login(
                       normalizeAuthUser(res.data, {
@@ -234,17 +234,14 @@ export const Register = () => {
                     return toast.error("Location required");
 
                   try {
-                    const res = await axios.post(
-                      "https://recruitment-platform-backend-azure.vercel.app/api/auth/register",
-                      {
-                        companyName: companyData.name,
-                        email: companyData.email,
-                        password: companyData.password,
-                        industry: companyData.industry,
-                        location: companyData.location,
-                        role: "company",
-                      },
-                    );
+                    const res = await axios.post(`${API_URL}/auth/register`, {
+                      companyName: companyData.name,
+                      email: companyData.email,
+                      password: companyData.password,
+                      industry: companyData.industry,
+                      location: companyData.location,
+                      role: "company",
+                    });
 
                     localStorage.setItem("token", res.data.token);
 

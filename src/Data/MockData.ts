@@ -1,3 +1,6 @@
+export const API_URL =
+  "https://recruitment-platform-backend-azure.vercel.app/api";
+
 export interface JobPosting {
   _id: string;
   active: boolean;
@@ -33,6 +36,19 @@ export interface Job {
   isSaved: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Profile {
+  name: string;
+  email: string;
+  title: string;
+  location: string;
+  experience: string;
+  education: string;
+  skills: string[];
+  certifications: string[];
+  preferredField: string;
+  bio: string;
 }
 
 export interface JobsResponse {

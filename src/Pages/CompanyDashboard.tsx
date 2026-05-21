@@ -51,7 +51,7 @@ import {
 } from "@/Components/dialog";
 
 // Data
-import { JobPosting, Candidate } from "@/Data/MockData";
+import { JobPosting, Candidate, API_URL } from "@/Data/MockData";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
@@ -152,7 +152,7 @@ export const CompanyDashboard = () => {
           success: boolean;
           count: number;
           data: Candidate[];
-        }>("https://recruitment-platform-backend-azure.vercel.app/api/candidates");
+        }>(`${API_URL}/candidates`);
 
         setCandidates(response.data.data);
       } catch (error) {
@@ -204,10 +204,7 @@ export const CompanyDashboard = () => {
     };
 
     try {
-      const response = await axios.post(
-        "https://recruitment-platform-backend-azure.vercel.app/api/jobs",
-        payload,
-      );
+      const response = await axios.post(`${API_URL}/candidates/jobs`, payload);
 
       setPostings([response.data.data, ...postings]);
 
@@ -229,7 +226,7 @@ export const CompanyDashboard = () => {
     );
 
     try {
-      await axios.patch(`https://recruitment-platform-backend-azure.vercel.app/api/jobs/${id}`, {
+      await axios.patch(`${API_URL}/candidates/jobs/jobs/${id}`, {
         active: false,
       });
 
@@ -243,7 +240,7 @@ export const CompanyDashboard = () => {
   //! ------ Delete any Post Functions ------
   const deletePosting = async (id: string) => {
     try {
-      await axios.delete(`https://recruitment-platform-backend-azure.vercel.app/api/jobs/${id}`);
+      await axios.delete(`${API_URL}/candidates/jobs/jobs/${id}`);
 
       setPostings((prev) => prev.filter((p) => p._id !== id));
 

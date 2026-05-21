@@ -1,5 +1,5 @@
 // React Libraries
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -45,31 +45,18 @@ import {
 } from "@/Components/dialog";
 
 // Data
-import { Course, SkillTest } from "@/Data/MockData";
+import { Course, SkillTest, API_URL, Profile } from "@/Data/MockData";
 
 // Custom Hooks
 import { useJobs } from "@/Hooks/useJobs";
 import { useAuth } from "@/Contexts/AuthContext";
-import { getUserFirstName, getUserDisplayName } from "@/Utils/authDisplay";
+import { getUserFirstName } from "@/Utils/authDisplay";
 
 export const SeekerDashboard = () => {
   const { user } = useAuth();
-  const seekerName = getUserDisplayName(user) || "Job Seeker";
   const firstName = getUserFirstName(user, "Job Seeker");
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    name: seekerName,
-    email: user?.email || "",
-    title: "Frontend Engineer",
-    location: "Cairo, Egypt",
-    experience: "3 years",
-    education: " (Communications & Electronics) Zagazig Universty",
-    skills: ["React", "TypeScript", "Tailwind CSS", "JavaScript", "HTML/CSS"],
-    certifications: ["AWS Certified Developer", "Meta Frontend Certificate"],
-    preferredField: "Frontend",
-    bio: "Passionate frontend engineer with experience building scalable web applications using React and TypeScript.",
-  });
   const [newSkill, setNewSkill] = useState("");
   const [testDialog, setTestDialog] = useState<string | null>(null);
   const [enrollDialog, setEnrollDialog] = useState<string | null>(null);
@@ -78,28 +65,31 @@ export const SeekerDashboard = () => {
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [skillTests, setSkillTests] = useState<SkillTest[]>([]);
   const [loadingTests, setLoadingTests] = useState(false);
-
-  useEffect(() => {
-    setProfile((currentProfile) => ({
-      ...currentProfile,
-      name: seekerName,
-      email: user?.email || currentProfile.email,
-      preferredField: user?.preferredField || currentProfile.preferredField,
-      location: user?.location || currentProfile.location,
-    }));
-  }, [seekerName, user?.email, user?.location, user?.preferredField]);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profile, setProfile] = useState<Profile>({
+    name: "",
+    email: "",
+    title: "",
+    location: "",
+    experience: "",
+    education: "",
+    skills: [],
+    certifications: [],
+    preferredField: "",
+    bio: "",
+  });
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoadingCourses(true);
 
-        const API_URL = "https://recruitment-platform-backend-azure.vercel.app/api/courses";
         const response = await axios.get<{
           success: boolean;
           count: number;
           data: Course[];
-        }>(API_URL);
+        }>(`${API_URL}/courses`);
 
         setCourses(response.data.data);
       } catch (error) {
@@ -122,7 +112,7 @@ export const SeekerDashboard = () => {
           success: boolean;
           count: number;
           data: SkillTest[];
-        }>("https://recruitment-platform-backend-azure.vercel.app/api/skill-tests");
+        }>(`${API_URL}/skill-tests`);
 
         setSkillTests(response.data.data);
       } catch (error) {
@@ -136,28 +126,107 @@ export const SeekerDashboard = () => {
     fetchSkillTests();
   }, []);
 
-  const recommendedJobs = jobs.filter(
-    (j) =>
-      j.category === profile.preferredField ||
-      profile.skills.some((s) =>
-        j.description.toLowerCase().includes(s.toLowerCase()),
-      ),
-  );
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoadingProfile(true);
+
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await axios.get(`${API_URL}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const userData = response.data?.data ?? {};
+
+        setProfile({
+          name: userData.name || "",
+          email: userData.email || "",
+          title: userData.title || "",
+          location: userData.location || "",
+          experience: userData.experience || "",
+          education: userData.education || "",
+          skills: userData.skills || [],
+          certifications: userData.certifications || [],
+          preferredField: userData.preferredField || "",
+          bio: userData.bio || "",
+        });
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load profile");
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const recommendedJobs = useMemo(() => {
+    return jobs.filter(
+      (j) =>
+        j.category === profile.preferredField ||
+        profile.skills.some((s) =>
+          (j.description || "").toLowerCase().includes(s.toLowerCase()),
+        ),
+    );
+  }, [jobs, profile.preferredField, profile.skills]);
 
   const addSkill = () => {
-    if (newSkill.trim() && !profile.skills.includes(newSkill.trim())) {
-      setProfile({ ...profile, skills: [...profile.skills, newSkill.trim()] });
+    if (
+      newSkill.trim() &&
+      !profile.skills.some(
+        (s) => s.toLowerCase() === newSkill.trim().toLowerCase(),
+      )
+    ) {
+      setProfile((prev) => ({
+        ...prev,
+        skills: [...prev.skills, newSkill.trim()],
+      }));
+
       setNewSkill("");
       toast.success("Skill added!");
     }
   };
 
   const removeSkill = (skill: string) => {
-    setProfile({
-      ...profile,
-      skills: profile.skills.filter((s) => s !== skill),
-    });
+    setProfile((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((s) => s !== skill),
+    }));
   };
+
+  const handleSaveProfile = async () => {
+    try {
+      setSavingProfile(true); // 👈 start loading
+
+      const token = localStorage.getItem("token");
+
+      await axios.put(`${API_URL}/auth/profile`, profile, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Profile saved!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save profile");
+    } finally {
+      setSavingProfile(false); // 👈 stop loading
+    }
+  };
+
+  if (loadingProfile) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        Loading profile...
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -253,7 +322,7 @@ export const SeekerDashboard = () => {
               </h2>
               {loadingCourses ? (
                 <p className="text-muted-foreground">Loading courses...</p>
-              ) : courses.length === 0 ? (
+              ) : courses?.length === 0 ? (
                 <p className="text-muted-foreground">No courses available.</p>
               ) : recommendedJobs.length === 0 ? (
                 <p className="text-muted-foreground">
@@ -280,15 +349,26 @@ export const SeekerDashboard = () => {
                   variant={isEditing ? "default" : "outline"}
                   size="sm"
                   className="gap-2"
+                  disabled={savingProfile}
                   onClick={() => {
-                    if (isEditing) toast.success("Profile saved!");
-                    setIsEditing(!isEditing);
+                    if (isEditing) {
+                      handleSaveProfile();
+                    } else {
+                      setIsEditing(true);
+                    }
                   }}
                 >
                   {isEditing ? (
-                    <>
-                      <Save className="h-4 w-4" /> Save
-                    </>
+                    savingProfile ? (
+                      <>
+                        <Clock className="h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4" /> Save
+                      </>
+                    )
                   ) : (
                     <>
                       <Edit className="h-4 w-4" /> Edit
@@ -305,7 +385,10 @@ export const SeekerDashboard = () => {
                       disabled={!isEditing}
                       value={profile.name}
                       onChange={(e) =>
-                        setProfile({ ...profile, name: e.target.value })
+                        setProfile((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -315,7 +398,10 @@ export const SeekerDashboard = () => {
                       disabled={!isEditing}
                       value={profile.email}
                       onChange={(e) =>
-                        setProfile({ ...profile, email: e.target.value })
+                        setProfile((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -325,7 +411,10 @@ export const SeekerDashboard = () => {
                       disabled={!isEditing}
                       value={profile.title}
                       onChange={(e) =>
-                        setProfile({ ...profile, title: e.target.value })
+                        setProfile((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -345,7 +434,10 @@ export const SeekerDashboard = () => {
                       disabled={!isEditing}
                       value={profile.experience}
                       onChange={(e) =>
-                        setProfile({ ...profile, experience: e.target.value })
+                        setProfile((prev) => ({
+                          ...prev,
+                          experience: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -355,7 +447,7 @@ export const SeekerDashboard = () => {
                       disabled={!isEditing}
                       value={profile.preferredField}
                       onValueChange={(v) =>
-                        setProfile({ ...profile, preferredField: v })
+                        setProfile((prev) => ({ ...prev, preferredField: v }))
                       }
                     >
                       <SelectTrigger>
@@ -378,7 +470,10 @@ export const SeekerDashboard = () => {
                     disabled={!isEditing}
                     value={profile.education}
                     onChange={(e) =>
-                      setProfile({ ...profile, education: e.target.value })
+                      setProfile((prev) => ({
+                        ...prev,
+                        education: e.target.value,
+                      }))
                     }
                   />
                 </div>
@@ -389,7 +484,7 @@ export const SeekerDashboard = () => {
                     disabled={!isEditing}
                     value={profile.bio}
                     onChange={(e) =>
-                      setProfile({ ...profile, bio: e.target.value })
+                      setProfile((prev) => ({ ...prev, bio: e.target.value }))
                     }
                     rows={3}
                   />
@@ -457,7 +552,7 @@ export const SeekerDashboard = () => {
             <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
               {loadingTests ? (
                 <p className="text-muted-foreground">Loading tests...</p>
-              ) : skillTests.length === 0 ? (
+              ) : skillTests?.length === 0 ? (
                 <p className="text-muted-foreground">No tests available.</p>
               ) : (
                 skillTests.map((test, i) => (
@@ -564,7 +659,7 @@ export const SeekerDashboard = () => {
             {loadingCourses ? (
               <p className="text-muted-foreground">Loading courses...</p>
             ) : (
-            <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {courses.map((course, i) => (
                   <motion.div
                     key={course._id}
