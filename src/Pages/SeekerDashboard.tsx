@@ -53,7 +53,7 @@ import { useAuth } from "@/Contexts/AuthContext";
 import { getUserFirstName } from "@/Utils/authDisplay";
 
 export const SeekerDashboard = () => {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const firstName = getUserFirstName(user, "Job Seeker");
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
@@ -67,18 +67,18 @@ export const SeekerDashboard = () => {
   const [loadingTests, setLoadingTests] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [profile, setProfile] = useState<Profile>({
-    name: "",
-    email: "",
-    title: "",
-    location: "",
-    experience: "",
-    education: "",
-    skills: [],
-    certifications: [],
-    preferredField: "",
-    bio: "",
-  });
+  const [profile, setProfile] = useState<Profile>(() => ({
+    name: user?.name || "",
+    email: user?.email || "",
+    title: profile?.title || "",
+    location: user?.location || "",
+    experience: profile?.experience || "",
+    education: profile?.education || "",
+    skills: profile?.skills || [],
+    certifications: profile?.certifications || [],
+    preferredField: user?.preferredField || "",
+    bio: profile?.bio || "",
+  }));
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -133,28 +133,17 @@ export const SeekerDashboard = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await axios.get(`${API_URL}/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await axios.get(`${API_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        const userData = response.data?.data ?? {};
+        const userData = res.data?.data;
 
-        setProfile({
-          name: userData.name || "",
-          email: userData.email || "",
-          title: userData.title || "",
-          location: userData.location || "",
-          experience: userData.experience || "",
-          education: userData.education || "",
-          skills: userData.skills || [],
-          certifications: userData.certifications || [],
-          preferredField: userData.preferredField || "",
-          bio: userData.bio || "",
-        });
-      } catch (error) {
-        console.error(error);
+        setProfile((prev) => ({
+          ...prev,
+          ...userData,
+        }));
+      } catch (err) {
         toast.error("Failed to load profile");
       } finally {
         setLoadingProfile(false);
@@ -200,23 +189,42 @@ export const SeekerDashboard = () => {
 
   const handleSaveProfile = async () => {
     try {
-      setSavingProfile(true); // 👈 start loading
+      setSavingProfile(true);
 
       const token = localStorage.getItem("token");
 
-      await axios.put(`${API_URL}/auth/profile`, profile, {
+      const res = await axios.put(`${API_URL}/auth/profile`, profile, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      toast.success("Profile saved!");
+      const updatedUser = res.data?.data;
+
+      // update UI immediately
+      setProfile((prev) => ({
+        ...prev,
+        ...updatedUser,
+      }));
+
+      // IMPORTANT: update auth context
+      login(
+        {
+          _id: updatedUser._id,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          name: updatedUser.name,
+          preferredField: updatedUser.preferredField,
+        },
+        token,
+      );
+
+      toast.success("Profile updated!");
       setIsEditing(false);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
       toast.error("Failed to save profile");
     } finally {
-      setSavingProfile(false); // 👈 stop loading
+      setSavingProfile(false);
     }
   };
 
