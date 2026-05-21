@@ -67,18 +67,18 @@ export const SeekerDashboard = () => {
   const [loadingTests, setLoadingTests] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [profile, setProfile] = useState<Profile>(() => ({
-    name: user?.name || "",
-    email: user?.email || "",
-    title: profile?.title || "",
-    location: user?.location || "",
-    experience: profile?.experience || "",
-    education: profile?.education || "",
-    skills: profile?.skills || [],
-    certifications: profile?.certifications || [],
-    preferredField: user?.preferredField || "",
-    bio: profile?.bio || "",
-  }));
+  const [profile, setProfile] = useState<Profile>({
+    name: "",
+    email: "",
+    title: "",
+    location: "",
+    experience: "",
+    education: "",
+    skills: [],
+    certifications: [],
+    preferredField: "",
+    bio: "",
+  });
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -133,18 +133,34 @@ export const SeekerDashboard = () => {
       try {
         const token = localStorage.getItem("token");
 
+        if (!token) {
+          toast.error("No auth token found");
+          setLoadingProfile(false);
+          return;
+        }
+
         const res = await axios.get(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         const userData = res.data?.data;
 
-        setProfile((prev) => ({
-          ...prev,
-          ...userData,
-        }));
+        setProfile({
+          name: userData.name || "",
+          email: userData.email || "",
+          title: userData.title || "",
+          location: userData.location || "",
+          experience: userData.experience || "",
+          education: userData.education || "",
+          skills: userData.skills || [],
+          certifications: userData.certifications || [],
+          preferredField: userData.preferredField || "",
+          bio: userData.bio || "",
+        });
       } catch (err) {
-        toast.error("Failed to load profile");
+        console.error("Profile save error:", err);
+        toast.error("Failed to save profile");
+        setIsEditing(false);
       } finally {
         setLoadingProfile(false);
       }
@@ -154,13 +170,21 @@ export const SeekerDashboard = () => {
   }, []);
 
   const recommendedJobs = useMemo(() => {
-    return jobs.filter(
-      (j) =>
-        j.category === profile.preferredField ||
-        profile.skills.some((s) =>
-          (j.description || "").toLowerCase().includes(s.toLowerCase()),
+    if (!jobs?.length) return [];
+
+    return jobs.filter((j) => {
+      const jobSkills = j.skills ?? [];
+
+      const matchCategory = j.category === profile.preferredField;
+
+      const matchSkills = jobSkills.some((jobSkill) =>
+        profile.skills.some((userSkill) =>
+          jobSkill.toLowerCase().includes(userSkill.toLowerCase()),
         ),
-    );
+      );
+
+      return matchCategory || matchSkills;
+    });
   }, [jobs, profile.preferredField, profile.skills]);
 
   const addSkill = () => {
@@ -170,10 +194,18 @@ export const SeekerDashboard = () => {
         (s) => s.toLowerCase() === newSkill.trim().toLowerCase(),
       )
     ) {
-      setProfile((prev) => ({
-        ...prev,
-        skills: [...prev.skills, newSkill.trim()],
-      }));
+      setProfile((prev) => {
+        const normalized = newSkill.trim().toLowerCase();
+
+        if (prev.skills.some((s) => s.toLowerCase() === normalized)) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          skills: [...prev.skills, newSkill.trim()],
+        };
+      });
 
       setNewSkill("");
       toast.success("Skill added!");
@@ -193,7 +225,13 @@ export const SeekerDashboard = () => {
 
       const token = localStorage.getItem("token");
 
-      const res = await axios.put(`${API_URL}/auth/profile`, profile, {
+      if (!token) {
+        toast.error("No auth token found");
+        setLoadingProfile(false);
+        return;
+      }
+
+      const res = await axios.patch(`${API_URL}/auth/me`, profile, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -205,6 +243,8 @@ export const SeekerDashboard = () => {
       setProfile((prev) => ({
         ...prev,
         ...updatedUser,
+        skills: updatedUser.skills ?? prev.skills,
+        certifications: updatedUser.certifications ?? prev.certifications,
       }));
 
       // IMPORTANT: update auth context
@@ -226,6 +266,13 @@ export const SeekerDashboard = () => {
     } finally {
       setSavingProfile(false);
     }
+  };
+
+  const handleChange = (field: keyof Profile, value: string) => {
+    setProfile((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   if (loadingProfile) {
@@ -330,7 +377,7 @@ export const SeekerDashboard = () => {
               </h2>
               {loadingCourses ? (
                 <p className="text-muted-foreground">Loading courses...</p>
-              ) : courses?.length === 0 ? (
+              ) : courses.length === 0 ? (
                 <p className="text-muted-foreground">No courses available.</p>
               ) : recommendedJobs.length === 0 ? (
                 <p className="text-muted-foreground">
@@ -392,12 +439,7 @@ export const SeekerDashboard = () => {
                     <Input
                       disabled={!isEditing}
                       value={profile.name}
-                      onChange={(e) =>
-                        setProfile((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => handleChange("name", e.target.value)}
                     />
                   </div>
                   <div>
@@ -405,12 +447,7 @@ export const SeekerDashboard = () => {
                     <Input
                       disabled={!isEditing}
                       value={profile.email}
-                      onChange={(e) =>
-                        setProfile((prev) => ({
-                          ...prev,
-                          email: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => handleChange("email", e.target.value)}
                     />
                   </div>
                   <div>
@@ -418,12 +455,7 @@ export const SeekerDashboard = () => {
                     <Input
                       disabled={!isEditing}
                       value={profile.title}
-                      onChange={(e) =>
-                        setProfile((prev) => ({
-                          ...prev,
-                          title: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => handleChange("title", e.target.value)}
                     />
                   </div>
                   <div>
@@ -431,9 +463,7 @@ export const SeekerDashboard = () => {
                     <Input
                       disabled={!isEditing}
                       value={profile.location}
-                      onChange={(e) =>
-                        setProfile({ ...profile, location: e.target.value })
-                      }
+                      onChange={(e) => handleChange("location", e.target.value)}
                     />
                   </div>
                   <div>
@@ -442,10 +472,7 @@ export const SeekerDashboard = () => {
                       disabled={!isEditing}
                       value={profile.experience}
                       onChange={(e) =>
-                        setProfile((prev) => ({
-                          ...prev,
-                          experience: e.target.value,
-                        }))
+                        handleChange("experience", e.target.value)
                       }
                     />
                   </div>
@@ -477,12 +504,7 @@ export const SeekerDashboard = () => {
                   <Input
                     disabled={!isEditing}
                     value={profile.education}
-                    onChange={(e) =>
-                      setProfile((prev) => ({
-                        ...prev,
-                        education: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleChange("education", e.target.value)}
                   />
                 </div>
 
@@ -491,9 +513,7 @@ export const SeekerDashboard = () => {
                   <Textarea
                     disabled={!isEditing}
                     value={profile.bio}
-                    onChange={(e) =>
-                      setProfile((prev) => ({ ...prev, bio: e.target.value }))
-                    }
+                    onChange={(e) => handleChange("bio", e.target.value)}
                     rows={3}
                   />
                 </div>
@@ -537,8 +557,12 @@ export const SeekerDashboard = () => {
                 <div>
                   <Label className="mb-2 block">Certifications</Label>
                   <div className="flex flex-wrap gap-2">
-                    {profile.certifications.map((c) => (
-                      <Badge key={c} variant="outline" className="gap-1">
+                    {profile.certifications.map((c, i) => (
+                      <Badge
+                        key={`${c}-${i}`}
+                        variant="outline"
+                        className="gap-1"
+                      >
                         <Award className="h-3 w-3" /> {c}
                       </Badge>
                     ))}

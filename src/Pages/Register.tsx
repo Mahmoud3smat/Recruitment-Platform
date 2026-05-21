@@ -29,6 +29,7 @@ import { useJobs } from "@/Hooks/useJobs";
 
 // Data
 import { API_URL } from "@/Data/MockData";
+import { toNamespacedPath } from "node:path";
 
 export const Register = () => {
   const [seekerData, setSeekerData] = useState({
@@ -106,7 +107,7 @@ export const Register = () => {
 
                   try {
                     const res = await axios.post(`${API_URL}/auth/register`, {
-                      fullName: seekerData.name,
+                      name: seekerData.name,
                       email: seekerData.email,
                       password: seekerData.password,
                       preferredField: seekerData.field,
@@ -115,7 +116,6 @@ export const Register = () => {
 
                     login(
                       normalizeAuthUser(res.data, {
-                        fullName: seekerData.name,
                         name: seekerData.name,
                         email: seekerData.email,
                         preferredField: seekerData.field,
@@ -235,11 +235,12 @@ export const Register = () => {
 
                   try {
                     const res = await axios.post(`${API_URL}/auth/register`, {
+                      name: companyData.name,
                       companyName: companyData.name,
                       email: companyData.email,
                       password: companyData.password,
                       industry: companyData.industry,
-                      location: companyData.location,
+                      companyLocation: companyData.location,
                       role: "company",
                     });
 
